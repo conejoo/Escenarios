@@ -40,7 +40,7 @@ void MainWindow::openScenarioPromp(){
 
 void MainWindow::exportScenariosPromp(){
 	QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-												"/home",
+												"",
 												QFileDialog::ShowDirsOnly
 												| QFileDialog::DontResolveSymlinks);
 	if(dir.size() == 0)

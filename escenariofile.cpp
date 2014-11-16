@@ -9,8 +9,7 @@ EscenarioFile::EscenarioFile(){}
 EscenarioFile::EscenarioFile(std::string filename)
 {
 	std::ifstream infile(filename.c_str());
-	int i = 0;
-	for(std::string line; std::getline(infile, line); i++)
+	for(std::string line; std::getline(infile, line);)
 		lines.push_back(line);
 	find_file_sections();
 	process_materials();
