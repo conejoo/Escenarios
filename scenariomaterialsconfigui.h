@@ -16,6 +16,7 @@ class ScenarioMaterialsConfigUI : public QWidget
 	public:
 		explicit ScenarioMaterialsConfigUI(QWidget *parent, std::vector<Material>& materials, int index);
 		~ScenarioMaterialsConfigUI();
+		QString name;
 
 	private:
 		Ui::ScenarioMaterialsConfigUI *ui;

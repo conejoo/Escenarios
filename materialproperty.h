@@ -7,11 +7,11 @@
 class MaterialProperty
 {
 	public:
-		MaterialProperty(std::string name, float value);
-		float getValue(int n);
+		MaterialProperty(std::string name, std::string value);
+		std::string getValue(int n);
 		static const int ORIGINAL_VALUE = -1;
 		std::string name;
-		std::unordered_map<int, float> values; // index
+		std::unordered_map<int, std::string> values; // index
 };
 
 #endif // MATERIALPROPERTY_H

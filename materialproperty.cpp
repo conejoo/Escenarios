@@ -1,12 +1,12 @@
 #include "materialproperty.h"
 
-MaterialProperty::MaterialProperty(std::string name, float value)
+MaterialProperty::MaterialProperty(std::string name, std::string value)
 {
 	this->name = name;
 	int orig = ORIGINAL_VALUE;
 	this->values[orig] = value;
 }
 
-float MaterialProperty::getValue(int n){
+std::string MaterialProperty::getValue(int n){
 	return values[n];
 }

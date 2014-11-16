@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QLineEdit>
+#include <unordered_map>
 #include "material.h"
 
 namespace Ui {
@@ -17,12 +18,15 @@ class MaterialConfigUI : public QWidget
 		explicit MaterialConfigUI(QWidget *parent, Material& material, int material_index, bool read_only);
 		~MaterialConfigUI();
 
+	public slots:
+		void updatePropertyValue(QString new_value);
+
 	private:
 		Ui::MaterialConfigUI *ui;
 		Material& material;
 		int material_index;
 		bool read_only;
-		std::vector<QLineEdit*> line_edits;
+		std::unordered_map<QLineEdit*, MaterialProperty*> line_edits_material;
 };
 
 #endif // MATERIALCONFIGUI_H

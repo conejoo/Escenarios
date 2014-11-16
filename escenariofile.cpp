@@ -55,7 +55,7 @@ void EscenarioFile::process_seismic(){
 	std::string name;
 	std::istringstream ss(sesmic);
 	ss >> name;
-	float value;
+	std::string value;
 	ss >> value;
 	sesmic_escenarios[index] = value;
 	std::istringstream ssv(sesmicv);
@@ -65,3 +65,22 @@ void EscenarioFile::process_seismic(){
 	std::cout << "sesmicv_escenarios[index] " << sesmicv_escenarios[index] << std::endl;
 }
 
+void EscenarioFile::exportToFile(std::string filename, int seismic_index, int material_index){
+	std::cout << "Exporting to file: " << filename << std::endl;
+	std::ofstream myfile;
+	myfile.open(filename.c_str());
+	for(int i = 0; i < sesmic_position; i++)
+		myfile << lines[i] << std::endl;
+	myfile << "  seismic: " << sesmic_escenarios[seismic_index] << std::endl;
+	for(int i = sesmic_position + 1; i < sesmicv_position; i++)
+		myfile << lines[i] << std::endl;
+	myfile << "  seismicv: " << sesmicv_escenarios[seismic_index] << std::endl;
+	for(int i = sesmicv_position + 1; i <= material_types_position; i++)
+		myfile << lines[i] << std::endl;
+	for(Material &m: materials)
+		myfile << m.toString(material_index) << std::endl;
+	myfile << std::endl;
+	for(int i = design_standard_array_position; i < (int)lines.size(); i++)
+		myfile << lines[i] << std::endl;
+	myfile.close();
+}

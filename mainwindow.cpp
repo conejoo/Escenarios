@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include <QFileDialog>
+#include <iostream>
 #include "ui_mainwindow.h"
 #include "escenariofile.h"
 #include "scenariomaterialsconfigui.h"
@@ -21,8 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(&this->scenarios_config, SIGNAL(addedSismicScenario(int,QString)), this, SLOT(addSismicScenario(int,QString)));
 	connect(&this->scenarios_config, SIGNAL(changedNameSismicScenario(int,QString)), this, SLOT(changedSismicName(int,QString)));
 	connect(&this->scenarios_config, SIGNAL(removedSismicScenario(int)), this, SLOT(removeSeismicScenario(int)));
-	std::string fixed_se = std::string("D:/Desarrollo/build-Escenarios-Desktop_Qt_5_3_MinGW_32bit-Debug/data/pilas_lix.sli");
-	openScenario(fixed_se);
 }
 
 MainWindow::~MainWindow()
@@ -31,10 +30,11 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::openScenarioPromp(){
-
 	QString filename = QFileDialog::getOpenFileName(this,
 													("Open File"), "",
 													"Scenarios (*.sli)");
+	if(filename.size() == 0)
+		return; // cancel
 	openScenario(filename.toStdString());
 }
 
@@ -43,7 +43,16 @@ void MainWindow::exportScenariosPromp(){
 												"/home",
 												QFileDialog::ShowDirsOnly
 												| QFileDialog::DontResolveSymlinks);
-	//for()
+	if(dir.size() == 0)
+		return; // cancel
+	for (const auto& material_id: main_scenario.materials_scenarios_ids) {
+		ScenarioMaterialsConfigUI* material_config = custom_material_schenarios_ui[material_id];
+		for(const auto& seismic_id: main_scenario.seismic_scenarios_ids){
+			ScenarioSismicConfigUI* seismic_config = custom_seismic_schenarios_ui[seismic_id];
+			QString filename = dir + "/" + material_config->name + "_" + seismic_config->name + ".sli";
+			main_scenario.exportToFile(filename.toStdString(), seismic_id, material_id);
+		}
+	}
 }
 
 void MainWindow::openScenario(std::string filename){
@@ -66,6 +75,7 @@ void MainWindow::removeAllTabs(QTabWidget* tabs){
 
 void MainWindow::addMaterialScenario(int index, QString name){
 	ScenarioMaterialsConfigUI* config = new ScenarioMaterialsConfigUI(this, main_scenario.materials, index);
+	config->name = name;
 	custom_material_schenarios_ui[index] = config;
 	ui->tabWidget->addTab(config, name);
 	main_scenario.materials_scenarios_ids.insert(index);
@@ -73,6 +83,7 @@ void MainWindow::addMaterialScenario(int index, QString name){
 
 void MainWindow::addSismicScenario(int index, QString name){
 	ScenarioSismicConfigUI* config = new ScenarioSismicConfigUI(this, main_scenario, index);
+	config->name = name;
 	custom_seismic_schenarios_ui[index] = config;
 	ui->tabWidget_sesmic->addTab(config, name);
 	main_scenario.seismic_scenarios_ids.insert(index);
@@ -91,6 +102,7 @@ int MainWindow::findTabIndex(QWidget* widget, QTabWidget* tab_widget){
 
 void MainWindow::changedMaterialName(int index, QString new_name){
 	ScenarioMaterialsConfigUI* config = custom_material_schenarios_ui[index];
+	config->name = new_name;
 	int tab_position = findTabIndex(config, ui->tabWidget);
 	ui->tabWidget->setTabText(tab_position, new_name);
 }
@@ -99,18 +111,19 @@ void MainWindow::removeMaterialScenario(int index){
 	ScenarioMaterialsConfigUI* config = custom_material_schenarios_ui[index];
 	int tab_position = findTabIndex(config, ui->tabWidget);
 	ui->tabWidget->removeTab(tab_position);
-	main_scenario.materials_scenarios_ids.remove(index);
+	main_scenario.materials_scenarios_ids.erase(index);
 }
 
 void MainWindow::removeSeismicScenario(int index){
 	ScenarioSismicConfigUI* config = custom_seismic_schenarios_ui[index];
 	int tab_position = findTabIndex(config, ui->tabWidget_sesmic);
 	ui->tabWidget_sesmic->removeTab(tab_position);
-	main_scenario.seismic_scenarios_ids.remove(index);
+	main_scenario.seismic_scenarios_ids.erase(index);
 }
 
 void MainWindow::changedSismicName(int index, QString new_name){
 	ScenarioSismicConfigUI* config = custom_seismic_schenarios_ui[index];
+	config->name = new_name;
 	int tab_position = findTabIndex(config, ui->tabWidget_sesmic);
 	ui->tabWidget_sesmic->setTabText(tab_position, new_name);
 }
