@@ -12,9 +12,31 @@ TARGET = Escenarios
 TEMPLATE = app
 
 
+QMAKE_CXXFLAGS += -std=c++0x -U__STRICT_ANSI__
+
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    escenariofile.cpp \
+    utils.cpp \
+    material.cpp \
+    materialproperty.cpp \
+    scenariomaterialsconfigui.cpp \
+    materialconfigui.cpp \
+    scenariosconfigui.cpp \
+    scenariosismicconfigui.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    escenariofile.h \
+    utils.h \
+    material.h \
+    materialproperty.h \
+    scenariomaterialsconfigui.h \
+    materialconfigui.h \
+    scenariosconfigui.h \
+    scenariosismicconfigui.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    scenariomaterialsconfigui.ui \
+    materialconfigui.ui \
+    scenariosconfigui.ui \
+    scenariosismicconfigui.ui
