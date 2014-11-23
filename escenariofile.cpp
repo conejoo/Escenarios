@@ -25,7 +25,7 @@ EscenarioFile::EscenarioFile(std::string filename)
 
 int EscenarioFile::find_empty_line(int pos){
 	for(unsigned int p = pos; p < lines.size(); p++)
-		if(lines[p].length() == 0)
+        if(Utils::trim(lines[p]).length() == 0)
 			return p;
 	return -1;
 }
