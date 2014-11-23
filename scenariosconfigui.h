@@ -21,8 +21,8 @@ class ScenariosConfigUI : public QWidget
 		explicit ScenariosConfigUI(QWidget *parent = 0);
 		~ScenariosConfigUI();
 		void setScenarioFile(EscenarioFile* file);
-		void addMaterialScenario(int);
-		void addSismicScenario(int);
+		void addMaterialScenario(int, QString);
+		void addSismicScenario(int, QString);
 
 	public slots:
 		void addNewMaterialScenario();

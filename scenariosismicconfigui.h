@@ -16,6 +16,8 @@ class ScenarioSismicConfigUI : public QWidget
 		explicit ScenarioSismicConfigUI(QWidget *parent, EscenarioFile& scenario, int index);
 		virtual ~ScenarioSismicConfigUI();
 		QString name;
+		void setNewName(QString);
+		bool isChecked();
 
 	public slots:
 		void changedSeismic();

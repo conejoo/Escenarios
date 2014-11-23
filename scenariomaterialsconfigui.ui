@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>668</width>
-    <height>437</height>
+    <width>228</width>
+    <height>220</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,21 +15,18 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QScrollArea" name="scrollArea">
-     <property name="widgetResizable">
-      <bool>true</bool>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>GroupBox</string>
      </property>
-     <widget class="QWidget" name="scrollAreaWidgetContents">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>648</width>
-        <height>417</height>
-       </rect>
+     <layout class="QFormLayout" name="formLayout">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2"/>
-     </widget>
+      <property name="verticalSpacing">
+       <number>0</number>
+      </property>
+     </layout>
     </widget>
    </item>
   </layout>

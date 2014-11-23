@@ -2,6 +2,7 @@
 #define SCENARIOMATERIALSCONFIGUI_H
 
 #include <QWidget>
+#include <QLineEdit>
 #include <vector>
 #include "material.h"
 
@@ -14,15 +15,19 @@ class ScenarioMaterialsConfigUI : public QWidget
 		Q_OBJECT
 
 	public:
-		explicit ScenarioMaterialsConfigUI(QWidget *parent, std::vector<Material>& materials, int index);
+		explicit ScenarioMaterialsConfigUI(QWidget *parent, int index, Material &material);
 		~ScenarioMaterialsConfigUI();
-		QString name;
+		void setName(QString);
+		void toggleProperty(int index, bool toggled);
+
+	public slots:
+		void updatePropertyValue(QString new_value);
 
 	private:
 		Ui::ScenarioMaterialsConfigUI *ui;
-		std::vector<Material>& materials;
-		bool read_only;
-		int index;
+		Material& material;
+		int material_index;
+		std::unordered_map<QLineEdit*, MaterialProperty*> line_edits_material;
 };
 
 #endif // SCENARIOMATERIALSCONFIGUI_H

@@ -23,7 +23,9 @@ SOURCES += main.cpp\
     scenariomaterialsconfigui.cpp \
     materialconfigui.cpp \
     scenariosconfigui.cpp \
-    scenariosismicconfigui.cpp
+    scenariosismicconfigui.cpp \
+    resultsprocessui.cpp \
+    resultfile.cpp
 
 HEADERS  += mainwindow.h \
     escenariofile.h \
@@ -33,10 +35,13 @@ HEADERS  += mainwindow.h \
     scenariomaterialsconfigui.h \
     materialconfigui.h \
     scenariosconfigui.h \
-    scenariosismicconfigui.h
+    scenariosismicconfigui.h \
+    resultsprocessui.h \
+    resultfile.h
 
 FORMS    += mainwindow.ui \
     scenariomaterialsconfigui.ui \
     materialconfigui.ui \
     scenariosconfigui.ui \
-    scenariosismicconfigui.ui
+    scenariosismicconfigui.ui \
+    resultsprocessui.ui

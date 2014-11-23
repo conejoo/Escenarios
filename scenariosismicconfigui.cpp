@@ -28,3 +28,12 @@ void ScenarioSismicConfigUI::changedSeismic(){
 	scenario.sesmic_escenarios[index] = ui->lineEdit_seismic->text().toStdString();
 	scenario.sesmicv_escenarios[index] = ui->lineEdit_seismicv->text().toStdString();
 }
+void ScenarioSismicConfigUI::setNewName(QString newName){
+	name = newName;
+	ui->groupBox->setTitle(newName);
+	ui->checkBox->setText("Generar Escenario " + newName);
+}
+
+bool ScenarioSismicConfigUI::isChecked(){
+	return ui->checkBox->isChecked();
+}

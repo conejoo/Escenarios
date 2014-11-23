@@ -2,8 +2,8 @@
 #define MATERIALCONFIGUI_H
 
 #include <QWidget>
-#include <QLineEdit>
 #include <unordered_map>
+#include "scenariomaterialsconfigui.h"
 #include "material.h"
 
 namespace Ui {
@@ -15,18 +15,18 @@ class MaterialConfigUI : public QWidget
 		Q_OBJECT
 
 	public:
-		explicit MaterialConfigUI(QWidget *parent, Material& material, int material_index, bool read_only);
+		explicit MaterialConfigUI(QWidget *parent, Material& material);
 		~MaterialConfigUI();
-
-	public slots:
-		void updatePropertyValue(QString new_value);
+		void escenarioRemoved(int index);
+		void escenarioAdded(int index, QString name);
+		void escenarioChangedName(int index, QString newname);
+		void toggleMaterial(int index, bool show);
+		void toggleProperty(int index, bool toggled);
 
 	private:
 		Ui::MaterialConfigUI *ui;
 		Material& material;
-		int material_index;
-		bool read_only;
-		std::unordered_map<QLineEdit*, MaterialProperty*> line_edits_material;
+		std::unordered_map<int, ScenarioMaterialsConfigUI*> material_scenarios;
 };
 
 #endif // MATERIALCONFIGUI_H

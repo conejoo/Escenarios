@@ -11,6 +11,7 @@ class MaterialProperty
 		std::string getValue(int n);
 		static const int ORIGINAL_VALUE = -1;
 		std::string name;
+		bool active;
 		std::unordered_map<int, std::string> values; // index
 };
 

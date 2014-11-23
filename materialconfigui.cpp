@@ -2,26 +2,13 @@
 #include "ui_materialconfigui.h"
 #include <QLabel>
 
-MaterialConfigUI::MaterialConfigUI(QWidget *parent, Material& material, int material_index, bool read_only) :
+MaterialConfigUI::MaterialConfigUI(QWidget *parent, Material& material) :
 	QWidget(parent),
 	ui(new Ui::MaterialConfigUI),
 	material(material)
 {
 	ui->setupUi(this);
-	this->material_index = material_index;
-	this->read_only = read_only;
 	ui->material_box->setTitle(QString::fromStdString(material.name));
-	for(MaterialProperty &property: material.properties){
-		std::string material_value = property.getValue(MaterialProperty::ORIGINAL_VALUE);
-		property.values[material_index] = material_value;
-		QLineEdit* line_edit = new QLineEdit(QString::fromStdString(material_value));
-		line_edit->setReadOnly(read_only);
-		QLabel* label = new QLabel(QString::fromStdString(property.name));
-		line_edits_material[line_edit] = &property;
-		ui->material_box->layout()->addWidget(label);
-		ui->material_box->layout()->addWidget(line_edit);
-		connect(line_edit, SIGNAL(textEdited(QString)), this, SLOT(updatePropertyValue(QString)));
-	}
 }
 
 MaterialConfigUI::~MaterialConfigUI()
@@ -29,8 +16,33 @@ MaterialConfigUI::~MaterialConfigUI()
 	delete ui;
 }
 
-void MaterialConfigUI::updatePropertyValue(QString new_value){
-	QLineEdit* line_edit = qobject_cast<QLineEdit *>(sender());
-	MaterialProperty* property = line_edits_material[line_edit];
-	property->values[material_index] = new_value.toStdString();
+void MaterialConfigUI::escenarioRemoved(int index){
+	ScenarioMaterialsConfigUI* config = material_scenarios[index];
+	ui->material_box->layout()->removeWidget(config);
+	delete config;
 }
+
+void MaterialConfigUI::escenarioAdded(int index, QString name){
+	ScenarioMaterialsConfigUI* config = new ScenarioMaterialsConfigUI(ui->material_box, index, material);
+	config->setName(name);
+	material_scenarios[index] = config;
+	ui->material_box->layout()->addWidget(config);
+}
+
+void MaterialConfigUI::escenarioChangedName(int index, QString newname){
+	ScenarioMaterialsConfigUI* config = material_scenarios[index];
+	config->setName(newname);
+}
+
+void MaterialConfigUI::toggleProperty(int index, bool toggled){
+	for(auto it: material_scenarios){
+		ScenarioMaterialsConfigUI* config = it.second;
+		config->toggleProperty(index, toggled);
+	}
+}
+void MaterialConfigUI::toggleMaterial(int index, bool show){
+	ScenarioMaterialsConfigUI* config = material_scenarios[index];
+	if(config)
+		config->setVisible(show);
+}
+

@@ -5,7 +5,7 @@
 #include <QFormLayout>
 
 ScenariosConfigUI::ScenariosConfigUI(QWidget *parent) :
-	QWidget(parent, Qt::Tool| Qt::Window | Qt::CustomizeWindowHint| Qt::WindowMinimizeButtonHint |Qt::WindowCloseButtonHint),
+	QWidget(parent, Qt::Tool| Qt::Window | Qt::CustomizeWindowHint| Qt::WindowMinimizeButtonHint |Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint),
 	ui(new Ui::ScenariosConfigUI)
 {
 	ui->setupUi(this);
@@ -21,7 +21,7 @@ ScenariosConfigUI::~ScenariosConfigUI()
 
 void ScenariosConfigUI::setScenarioFile(EscenarioFile* file)
 {
-	scenarios_index = 1;
+	scenarios_index = 10;
 	scenarios = file;
 	QLayoutItem *child;
 	while ((child = ui->widget_material_configs->layout()->takeAt(0)) != 0){
@@ -40,23 +40,25 @@ void ScenariosConfigUI::setScenarioFile(EscenarioFile* file)
 	line_edits_sismic.clear();
 	remove_buttons_sismic.clear();
 	line_edits_sismic_inv.clear();
-	addMaterialScenario(MaterialProperty::ORIGINAL_VALUE);
-	addSismicScenario(MaterialProperty::ORIGINAL_VALUE);
+	addMaterialScenario(1, QString("Escenario Bajo"));
+	addMaterialScenario(2, QString("Escenario Medio"));
+	addMaterialScenario(3, QString("Escenario Alto"));
+	addSismicScenario(4, QString("Sismo Operacional"));
+	addSismicScenario(5, QString("Abandono"));
 }
 
 void ScenariosConfigUI::addNewMaterialScenario(){
 	scenarios_index++;
-	addMaterialScenario(scenarios_index);
+	addMaterialScenario(scenarios_index, "New name");
 }
 
 void ScenariosConfigUI::addNewSismicScenario(){
 	scenarios_index++;
-	addSismicScenario(scenarios_index);
+	addSismicScenario(scenarios_index, "New name");
 }
 #include <iostream>
-void ScenariosConfigUI::addMaterialScenario(int index){
+void ScenariosConfigUI::addMaterialScenario(int index, QString name){
 	bool original = index == MaterialProperty::ORIGINAL_VALUE;
-	QString name((original)?"Original":"New name");
 	QLineEdit* line_edit = new QLineEdit(name);
 	QPushButton* button = new QPushButton(QString("Remove"));
 	button->setEnabled(!original);
@@ -70,9 +72,8 @@ void ScenariosConfigUI::addMaterialScenario(int index){
 	emit addedMaterialScenario(index, name);
 }
 
-void ScenariosConfigUI::addSismicScenario(int index){
+void ScenariosConfigUI::addSismicScenario(int index, QString name){
 	bool original = index == MaterialProperty::ORIGINAL_VALUE;
-	QString name((original)?"Original":"New name");
 	QLineEdit* line_edit = new QLineEdit(name);
 	QPushButton* button = new QPushButton(QString("Remove"));
 	button->setEnabled(!original);

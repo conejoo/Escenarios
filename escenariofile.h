@@ -21,8 +21,8 @@ class EscenarioFile
 		std::vector<Material> materials;
 		std::unordered_map<int, std::string> sesmic_escenarios;
 		std::unordered_map<int, std::string> sesmicv_escenarios;
-		std::unordered_set<int> seismic_scenarios_ids;
-		std::unordered_set<int> materials_scenarios_ids;
+		std::unordered_map<int, std::string> seismic_scenarios_ids;
+		std::unordered_map<int, std::string> materials_scenarios_ids;
 		int sesmic_position;
 		int sesmicv_position;
 		int material_types_position;
