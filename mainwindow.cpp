@@ -2,6 +2,7 @@
 #include <QFileDialog>
 #include <iostream>
 #include <QCheckBox>
+#include <QMessageBox>
 #include "ui_mainwindow.h"
 #include "escenariofile.h"
 #include "materialconfigui.h"
@@ -49,6 +50,7 @@ void MainWindow::exportScenariosPromp(){
 												| QFileDialog::DontResolveSymlinks);
 	if(dir.size() == 0)
 		return; // cancel
+	int n = 0;
 	for (const auto& ite: main_scenario.materials_scenarios_ids) {
 		int material_id = ite.first;
 		if(!index_qcheckbox_material_scenario[material_id]->isChecked())
@@ -61,8 +63,14 @@ void MainWindow::exportScenariosPromp(){
 			QString seismic_scenario_name = QString::fromStdString(ite2.second);
 			QString filename = dir + "/" + material_scenario_name + "_" + seismic_scenario_name + ".sli";
 			main_scenario.exportToFile(filename.toStdString(), seismic_id, material_id);
+			n++;
 		}
 	}
+	QMessageBox msgBox;
+	msgBox.setText(QString::number(n) +
+				   " nuevos escenarios han sido guardados en la carpeta " +
+				   dir);
+	msgBox.exec();
 }
 
 void MainWindow::openScenario(std::string filename){

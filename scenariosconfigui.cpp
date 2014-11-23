@@ -43,8 +43,9 @@ void ScenariosConfigUI::setScenarioFile(EscenarioFile* file)
 	addMaterialScenario(1, QString("Escenario Bajo"));
 	addMaterialScenario(2, QString("Escenario Medio"));
 	addMaterialScenario(3, QString("Escenario Alto"));
-	addSismicScenario(4, QString("Sismo Operacional"));
-	addSismicScenario(5, QString("Abandono"));
+	addSismicScenario(6, QString("Base"));
+	addSismicScenario(7, QString("Sismo Operacional"));
+	addSismicScenario(8, QString("Abandono"));
 }
 
 void ScenariosConfigUI::addNewMaterialScenario(){
