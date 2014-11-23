@@ -1,5 +1,5 @@
 #include "resultfile.h"
-#include "Utils.h"
+#include "utils.h"
 #include <fstream>
 #include <iostream>
 
