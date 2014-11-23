@@ -14,6 +14,7 @@ class EscenarioFile
 		EscenarioFile(std::string filename);
 		void exportToFile(std::string filename, int seismic_index, int material_index);
 		int find_line_starting_in(int pos, const char* chars);
+		int find_empty_line(int pos);
 		void find_file_sections();
 		void process_materials();
 		void process_seismic();
@@ -26,7 +27,7 @@ class EscenarioFile
 		int sesmic_position;
 		int sesmicv_position;
 		int material_types_position;
-		int design_standard_array_position;
+		int material_types_end;
 };
 
 #endif // ESCENARIOFILE_H

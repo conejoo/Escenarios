@@ -66,11 +66,16 @@ void MainWindow::exportScenariosPromp(){
 }
 
 void MainWindow::openScenario(std::string filename){
-	main_scenario = EscenarioFile(filename);
-	// TODO: FIX THIS
 	clearLayout(ui->widget_seismic->layout());
 	clearLayout(ui->widget_sensibilizar->layout());
-	//removeAllTabs(ui->tabWidget_sesmic);
+	clearLayout(ui->widget_materials->layout());
+	clearLayout(ui->scrollAreaWidgetContents->layout());
+	materials_ui.clear();
+	custom_seismic_schenarios_ui.clear();
+	qcheckbox_property_index.clear();
+	qcheckbox_material_scenario_index.clear();
+	index_qcheckbox_material_scenario.clear();
+	main_scenario = EscenarioFile(filename);
 	addProperties();
 	addMaterials();
 	scenarios_config.setScenarioFile(&main_scenario);

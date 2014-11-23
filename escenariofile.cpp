@@ -17,10 +17,17 @@ EscenarioFile::EscenarioFile(std::string filename)
 	std::cout << "sesmic_position " << sesmic_position << std::endl;
 	std::cout << "sesmicv_position " << sesmicv_position << std::endl;
 	std::cout << "material_types_position " << material_types_position << std::endl;
-	std::cout << "design_standard_array_position " << design_standard_array_position << std::endl;
+	std::cout << "material_types_end_position " << material_types_end << std::endl;
 	std::cout << "Materiales: "<< std::endl;
 	for(Material m: materials)
 		std::cout << m.toString() << std::endl;
+}
+
+int EscenarioFile::find_empty_line(int pos){
+	for(unsigned int p = pos; p < lines.size(); p++)
+		if(lines[p].length() == 0)
+			return p;
+	return -1;
 }
 
 int EscenarioFile::find_line_starting_in(int pos, const char* chars){
@@ -36,11 +43,11 @@ void EscenarioFile::find_file_sections()
 	sesmic_position = find_line_starting_in(0, "  seismic:");
 	sesmicv_position = find_line_starting_in(sesmic_position, "  seismicv:");
 	material_types_position = find_line_starting_in(sesmic_position, "material types:");
-	design_standard_array_position = find_line_starting_in(material_types_position, "design standard array:");
+	material_types_end = find_empty_line(material_types_position);
 }
 
 void EscenarioFile::process_materials(){
-	for(int start = material_types_position + 1; start < design_standard_array_position; start++){
+	for(int start = material_types_position + 1; start < material_types_end; start++){
 		std::string line = lines[start];
 		if(line.length() > 4)
 			materials.push_back(Material(line));
@@ -78,8 +85,7 @@ void EscenarioFile::exportToFile(std::string filename, int seismic_index, int ma
 		myfile << lines[i] << std::endl;
 	for(Material &m: materials)
 		myfile << m.toString(material_index) << std::endl;
-	myfile << std::endl;
-	for(int i = design_standard_array_position; i < (int)lines.size(); i++)
+	for(int i = material_types_end; i < (int)lines.size(); i++)
 		myfile << lines[i] << std::endl;
 	myfile.close();
 }
