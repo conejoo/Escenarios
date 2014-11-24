@@ -48,6 +48,8 @@ void ScenariosConfigUI::setScenarioFile(EscenarioFile* file)
 	addSismicScenario(index_base, QString("Base"), QString("base"));
 	addSismicScenario(7, QString("Sismo Operacional"), QString("op"));
 	addSismicScenario(8, QString("Abandono"), QString("ab"));
+	ui->pushButton_new_material->setEnabled(true);
+	ui->pushButton_new_sismic->setEnabled(true);
 }
 
 void ScenariosConfigUI::addNewMaterialScenario(){
