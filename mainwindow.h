@@ -25,12 +25,14 @@ class MainWindow : public QMainWindow
 	public slots:
 		void openScenarioPromp();
 		void exportScenariosPromp();
-		void addMaterialScenario(int, QString);
+		void addMaterialScenario(int, QString, QString);
 		void addProperties();
 		void addMaterials();
-		void addSismicScenario(int, QString);
+		void addSismicScenario(int, QString, QString);
 		void changedMaterialScenarioName(int index, QString new_name);
+		void changedMaterialScenarioAbbr(int index, QString abbr);
 		void changedSismicName(int, QString);
+		void changedSismicAbbr(int, QString abbr);
 		void removeMaterialScenario(int index);
 		void removeSeismicScenario(int);
 		void toggleProperty(bool);

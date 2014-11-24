@@ -1,22 +1,17 @@
 #include "scenariosismicconfigui.h"
 #include "ui_scenariosismicconfigui.h"
 
-ScenarioSismicConfigUI::ScenarioSismicConfigUI(QWidget *parent, EscenarioFile& scenario, int index) :
+ScenarioSismicConfigUI::ScenarioSismicConfigUI(QWidget *parent, EscenarioSeismicCustom* scenario) :
 	QWidget(parent),
-	ui(new Ui::ScenarioSismicConfigUI),
-	scenario(scenario)
+	ui(new Ui::ScenarioSismicConfigUI)
 {
+	this->scenario = scenario;
 	ui->setupUi(this);
-	this->index = index;
-	if(index != MaterialProperty::ORIGINAL_VALUE){
-		int base_index = MaterialProperty::ORIGINAL_VALUE;
-		scenario.sesmic_escenarios[index] = scenario.sesmic_escenarios[base_index];
-		scenario.sesmicv_escenarios[index] = scenario.sesmicv_escenarios[base_index];
-	}
-	ui->lineEdit_seismic->setText(QString::fromStdString(scenario.sesmic_escenarios[index]));
-	ui->lineEdit_seismicv->setText(QString::fromStdString(scenario.sesmicv_escenarios[index]));
+	ui->lineEdit_seismic->setText(QString::fromStdString(scenario->seismic));
+	ui->lineEdit_seismicv->setText(QString::fromStdString(scenario->seismicv));
 	connect(ui->lineEdit_seismic, SIGNAL(textEdited(QString)), this, SLOT(changedSeismic()));
 	connect(ui->lineEdit_seismicv, SIGNAL(textEdited(QString)), this, SLOT(changedSeismic()));
+	connect(ui->checkBox, SIGNAL(toggled(bool)), this, SLOT(changedSeismic()));
 }
 
 ScenarioSismicConfigUI::~ScenarioSismicConfigUI()
@@ -25,15 +20,15 @@ ScenarioSismicConfigUI::~ScenarioSismicConfigUI()
 }
 
 void ScenarioSismicConfigUI::changedSeismic(){
-	scenario.sesmic_escenarios[index] = ui->lineEdit_seismic->text().toStdString();
-	scenario.sesmicv_escenarios[index] = ui->lineEdit_seismicv->text().toStdString();
+	scenario->seismic = ui->lineEdit_seismic->text().toStdString();
+	scenario->seismicv = ui->lineEdit_seismicv->text().toStdString();
 }
-void ScenarioSismicConfigUI::setNewName(QString newName){
-	name = newName;
-	ui->groupBox->setTitle(newName);
-	ui->checkBox->setText("Generar Escenario " + newName);
+void ScenarioSismicConfigUI::setNewName(QString newName, QString abbr){
+	scenario->name = newName.toStdString();
+	scenario->abbr = abbr.toStdString();
+	ui->checkBox->setText("Generar Escenario " + newName + " (" + abbr + ")");
 }
 
-bool ScenarioSismicConfigUI::isChecked(){
-	return ui->checkBox->isChecked();
+void ScenarioSismicConfigUI::toggled(bool toggled){
+	scenario->enabled = toggled;
 }

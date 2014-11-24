@@ -2,7 +2,7 @@
 #define SCENARIOSISMICCONFIGUI_H
 
 #include <QWidget>
-#include "escenariofile.h"
+#include "escenarioseismiccustom.h"
 
 namespace Ui {
 class ScenarioSismicConfigUI;
@@ -13,19 +13,17 @@ class ScenarioSismicConfigUI : public QWidget
 		Q_OBJECT
 
 	public:
-		explicit ScenarioSismicConfigUI(QWidget *parent, EscenarioFile& scenario, int index);
+		explicit ScenarioSismicConfigUI(QWidget *parent, EscenarioSeismicCustom* scenario);
 		virtual ~ScenarioSismicConfigUI();
-		QString name;
-		void setNewName(QString);
-		bool isChecked();
+		void setNewName(QString, QString);
 
 	public slots:
 		void changedSeismic();
+		void toggled(bool);
 
 	private:
 		Ui::ScenarioSismicConfigUI *ui;
-		EscenarioFile& scenario;
-		int index;
+		EscenarioSeismicCustom* scenario;
 };
 
 #endif // SCENARIOSISMICCONFIGUI_H

@@ -11,13 +11,13 @@ ScenarioMaterialsConfigUI::ScenarioMaterialsConfigUI(QWidget *parent, int index,
 	ui->setupUi(this);
 	this->material_index = index;
 	//this->read_only = read_only;
+	QFormLayout * grid_layout = qobject_cast<QFormLayout *>(ui->groupBox->layout());
 	for(MaterialProperty &property: material.properties){
 		std::string material_value = property.getValue(MaterialProperty::ORIGINAL_VALUE);
 		property.values[material_index] = material_value;
 		QLineEdit* line_edit = new QLineEdit(QString::fromStdString(material_value));
 		//line_edit->setReadOnly(read_only);
 		line_edits_material[line_edit] = &property;
-		QFormLayout * grid_layout = qobject_cast<QFormLayout *>(ui->groupBox->layout());
 		grid_layout->addRow(QString::fromStdString(property.name), line_edit);
 		connect(line_edit, SIGNAL(textEdited(QString)), this, SLOT(updatePropertyValue(QString)));
 	}
@@ -26,12 +26,14 @@ ScenarioMaterialsConfigUI::ScenarioMaterialsConfigUI(QWidget *parent, int index,
 ScenarioMaterialsConfigUI::~ScenarioMaterialsConfigUI()
 {
 	delete ui;
+	for(auto& it: line_edits_material)
+		delete it.first;
 }
 
 void ScenarioMaterialsConfigUI::toggleProperty(int index, bool toggled){
 	QFormLayout * grid_layout = qobject_cast<QFormLayout *>(ui->groupBox->layout());
-	grid_layout->itemAt(index, QFormLayout::FieldRole)->widget()->setVisible(toggled);
-	grid_layout->itemAt(index, QFormLayout::LabelRole)->widget()->setVisible(toggled);
+	grid_layout->itemAt(index, QFormLayout::FieldRole)->widget()->setEnabled(toggled);
+	//grid_layout->itemAt(index, QFormLayout::LabelRole)->widget()->setVisible(toggled);
 }
 
 void ScenarioMaterialsConfigUI::updatePropertyValue(QString new_value){

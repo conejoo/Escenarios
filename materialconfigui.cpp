@@ -19,6 +19,7 @@ MaterialConfigUI::~MaterialConfigUI()
 void MaterialConfigUI::escenarioRemoved(int index){
 	ScenarioMaterialsConfigUI* config = material_scenarios[index];
 	ui->material_box->layout()->removeWidget(config);
+	material_scenarios.erase(index);
 	delete config;
 }
 

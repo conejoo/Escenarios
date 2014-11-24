@@ -33,7 +33,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>GroupBox</string>
+      <string>Coeficiente de Carga Sísmica</string>
      </property>
      <layout class="QFormLayout" name="formLayout_2">
       <property name="fieldGrowthPolicy">
@@ -42,7 +42,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>Seismic</string>
+         <string>Horizontal</string>
         </property>
        </widget>
       </item>
@@ -59,7 +59,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>Seismicv</string>
+         <string>Vertical</string>
         </property>
        </widget>
       </item>

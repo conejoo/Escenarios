@@ -20,11 +20,13 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(this->ui->actionOpen_Scenario, SIGNAL(triggered()), this, SLOT(openScenarioPromp()));
 	connect(this->ui->actionExport, SIGNAL(triggered()), this, SLOT(exportScenariosPromp()));
 	connect(this->ui->actionConfigurate_Scenarios, SIGNAL(triggered()), &this->scenarios_config, SLOT(show()));
-	connect(&this->scenarios_config, SIGNAL(addedMaterialScenario(int,QString)), this, SLOT(addMaterialScenario(int,QString)));
+	connect(&this->scenarios_config, SIGNAL(addedMaterialScenario(int,QString,QString)), this, SLOT(addMaterialScenario(int,QString,QString)));
 	connect(&this->scenarios_config, SIGNAL(changedNameMaterialScenario(int,QString)), this, SLOT(changedMaterialScenarioName(int,QString)));
+	connect(&this->scenarios_config, SIGNAL(changedAbbrMaterialScenario(int,QString)), this, SLOT(changedMaterialScenarioAbbr(int,QString)));
 	connect(&this->scenarios_config, SIGNAL(removedMaterialScenario(int)), this, SLOT(removeMaterialScenario(int)));
-	connect(&this->scenarios_config, SIGNAL(addedSismicScenario(int,QString)), this, SLOT(addSismicScenario(int,QString)));
+	connect(&this->scenarios_config, SIGNAL(addedSismicScenario(int,QString,QString)), this, SLOT(addSismicScenario(int,QString,QString)));
 	connect(&this->scenarios_config, SIGNAL(changedNameSismicScenario(int,QString)), this, SLOT(changedSismicName(int,QString)));
+	connect(&this->scenarios_config, SIGNAL(changedAbbrSismicScenario(int,QString)), this, SLOT(changedSismicAbbr(int,QString)));
 	connect(&this->scenarios_config, SIGNAL(removedSismicScenario(int)), this, SLOT(removeSeismicScenario(int)));
 	connect(this->ui->actionProcesar_resultados, SIGNAL(triggered()), &this->result_process_ui, SLOT(show()));
 }
@@ -48,22 +50,39 @@ void MainWindow::exportScenariosPromp(){
 												"",
 												QFileDialog::ShowDirsOnly
 												| QFileDialog::DontResolveSymlinks);
-	if(dir.size() == 0)
+	if(dir.size() == 0 || main_scenario.materials.size() == 0)
 		return; // cancel
 	int n = 0;
-	for (const auto& ite: main_scenario.materials_scenarios_ids) {
-		int material_id = ite.first;
-		if(!index_qcheckbox_material_scenario[material_id]->isChecked())
+	for (const auto& ite: main_scenario.materials_escenarios) {
+		EscenarioMaterialCustom* material_es = ite.second;
+		if(!material_es->enabled)
 			continue;
-		QString material_scenario_name = QString::fromStdString(ite.second);
-		for(const auto& ite2: main_scenario.seismic_scenarios_ids){
-			int seismic_id = ite2.first;
-			if(!custom_seismic_schenarios_ui[seismic_id]->isChecked())
+		QString material_scenario_abbr = QString::fromStdString(material_es->abbr);
+		for(const auto& ite2: main_scenario.seismic_escenarios){
+			EscenarioSeismicCustom* seismic_es = ite2.second;
+			if(!seismic_es->enabled)
 				continue;
-			QString seismic_scenario_name = QString::fromStdString(ite2.second);
-			QString filename = dir + "/" + material_scenario_name + "_" + seismic_scenario_name + ".sli";
-			main_scenario.exportToFile(filename.toStdString(), seismic_id, material_id);
-			n++;
+			QString seismic_scenario_abbr = QString::fromStdString(seismic_es->abbr);
+			QString filename = dir + "/" +
+				   QString::fromStdString(main_scenario.filename) + "_" +
+				   seismic_scenario_abbr + "_" +
+				   material_scenario_abbr;
+			if(material_es->index != MaterialProperty::ORIGINAL_VALUE){
+				Material& material = main_scenario.materials[0];
+				for(int p = 0; p < material.properties.size(); p++){
+					if(!material.properties[p].active)
+						continue;
+					QString complete_filename = filename + "_" + QString::fromStdString(material.properties[p].name) + ".sli";
+					main_scenario.exportToFile(complete_filename.toStdString(), seismic_es->index, material_es->index, p);
+					std::cout << "Exported to: " << complete_filename.toStdString() << std::endl;
+					n++;
+				}
+			}else{
+				filename = filename + ".sli";
+				main_scenario.exportToFile(filename.toStdString(), seismic_es->index, material_es->index, -1);
+				std::cout << "Exported to: " << filename.toStdString() << std::endl;
+				n++;
+			}
 		}
 	}
 	QMessageBox msgBox;
@@ -103,32 +122,43 @@ void MainWindow::clearLayout(QLayout *layout){
 	}
 }
 
-void MainWindow::addMaterialScenario(int index, QString name){
+void MainWindow::addMaterialScenario(int index, QString name, QString abbr){
+	main_scenario.createCustomMaterialScenario(index, name.toStdString(), abbr.toStdString());
 	for(MaterialConfigUI* config: materials_ui)
 		config->escenarioAdded(index, name);
-	QCheckBox* qcheckbox = new QCheckBox(name, ui->groupBox_escenarios);
+	QCheckBox* qcheckbox = new QCheckBox(name + " (" + abbr + ")", ui->groupBox_escenarios);
 	qcheckbox->setChecked(true);
+	if(index == MaterialProperty::ORIGINAL_VALUE)
+		qcheckbox->setDisabled(true);
 	ui->widget_materials->layout()->addWidget(qcheckbox);
 	index_qcheckbox_material_scenario[index] = qcheckbox;
 	qcheckbox_material_scenario_index[qcheckbox] = index;
 	connect(qcheckbox, SIGNAL(toggled(bool)), this, SLOT(toggleMaterialScenario(bool)));
-	main_scenario.materials_scenarios_ids[index] = name.toStdString();
 }
 
-void MainWindow::addSismicScenario(int index, QString name){
-	ScenarioSismicConfigUI* config = new ScenarioSismicConfigUI(this, main_scenario, index);
-	config->setNewName(name);
+void MainWindow::addSismicScenario(int index, QString name, QString abbr){
+	EscenarioSeismicCustom* custom = main_scenario.createCustomSeismicScenario(index, name.toStdString(), abbr.toStdString());
+	main_scenario.seismic_escenarios[index] = custom;
+	ScenarioSismicConfigUI* config = new ScenarioSismicConfigUI(this, custom);
+	config->setNewName(name, abbr);
 	custom_seismic_schenarios_ui[index] = config;
 	ui->widget_seismic->layout()->addWidget(config);
-	main_scenario.seismic_scenarios_ids[index] = name.toStdString();
 }
 
 void MainWindow::changedMaterialScenarioName(int index, QString new_name){
+	EscenarioMaterialCustom* custom = main_scenario.materials_escenarios[index];
 	for(MaterialConfigUI* config: materials_ui)
 		config->escenarioChangedName(index, new_name);
 	QCheckBox* checkbox = index_qcheckbox_material_scenario[index];
-	checkbox->setText(new_name);
-	main_scenario.materials_scenarios_ids[index] = new_name.toStdString();
+	checkbox->setText(new_name + " (" + QString::fromStdString(custom->abbr) + ")");
+	custom->name = new_name.toStdString();
+}
+
+void MainWindow::changedMaterialScenarioAbbr(int index, QString abbr){
+	EscenarioMaterialCustom* custom = main_scenario.materials_escenarios[index];
+	QCheckBox* checkbox = index_qcheckbox_material_scenario[index];
+	checkbox->setText(QString::fromStdString(custom->name) + " ("+abbr+")");
+	custom->abbr = abbr.toStdString();
 }
 
 void MainWindow::removeMaterialScenario(int index){
@@ -139,20 +169,26 @@ void MainWindow::removeMaterialScenario(int index){
 	qcheckbox_material_scenario_index.erase(checkbox);
 	ui->widget_materials->layout()->removeWidget(checkbox);
 	delete checkbox;
-	main_scenario.materials_scenarios_ids.erase(index);
+	main_scenario.deleteMaterialScenario(index);
 }
 
 void MainWindow::removeSeismicScenario(int index){
 	ScenarioSismicConfigUI* config = custom_seismic_schenarios_ui[index];
 	ui->widget_seismic->layout()->removeWidget(config);
 	delete config;
-	main_scenario.seismic_scenarios_ids.erase(index);
+	main_scenario.deleteSeismicScenario(index);
 }
 
 void MainWindow::changedSismicName(int index, QString new_name){
+	EscenarioSeismicCustom* custom = main_scenario.seismic_escenarios[index];
 	ScenarioSismicConfigUI* config = custom_seismic_schenarios_ui[index];
-	config->setNewName(new_name);
-	main_scenario.seismic_scenarios_ids[index] = new_name.toStdString();
+	config->setNewName(new_name, QString::fromStdString(custom->abbr));
+}
+
+void MainWindow::changedSismicAbbr(int index, QString abbr){
+	EscenarioSeismicCustom* custom = main_scenario.seismic_escenarios[index];
+	ScenarioSismicConfigUI* config = custom_seismic_schenarios_ui[index];
+	config->setNewName(QString::fromStdString(custom->name), abbr);
 }
 
 void MainWindow::addMaterials(){
@@ -192,8 +228,8 @@ void MainWindow::toggleMaterialScenario(bool toggled){
 	QCheckBox* checkbox = qobject_cast<QCheckBox *>(sender());
 	int index = qcheckbox_material_scenario_index[checkbox];
 	if(index){
-		for(MaterialConfigUI* material_ui: materials_ui){
+		for(MaterialConfigUI* material_ui: materials_ui)
 			material_ui->toggleMaterial(index, toggled);
-		}
+		main_scenario.materials_escenarios[index]->enabled = toggled;
 	}
 }

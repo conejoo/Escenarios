@@ -174,7 +174,7 @@
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>Archivo</string>
     </property>
     <addaction name="actionOpen_Scenario"/>
     <addaction name="actionExport"/>
@@ -184,7 +184,7 @@
    </widget>
    <widget class="QMenu" name="menuConfig">
     <property name="title">
-     <string>Config</string>
+     <string>Configuración</string>
     </property>
     <addaction name="actionConfigurate_Scenarios"/>
    </widget>
@@ -207,12 +207,12 @@
   </action>
   <action name="actionExit">
    <property name="text">
-    <string>Exit</string>
+    <string>Salir</string>
    </property>
   </action>
   <action name="actionConfigurate_Scenarios">
    <property name="text">
-    <string>Scenarios</string>
+    <string>Escenarios</string>
    </property>
   </action>
   <action name="actionExport">
