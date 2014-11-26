@@ -10,8 +10,8 @@ class EscenarioSeismicCustom
 		int index;
 		std::string name;
 		std::string abbr;
-		std::string seismic;
-		std::string seismicv;
+		double seismic;
+		double seismicv;
 		bool enabled;
 };
 

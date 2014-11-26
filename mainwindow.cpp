@@ -69,10 +69,10 @@ void MainWindow::exportScenariosPromp(){
 				   material_scenario_abbr;
 			if(material_es->index != MaterialProperty::ORIGINAL_VALUE){
 				Material& material = main_scenario.materials[0];
-				for(int p = 0; p < material.properties.size(); p++){
-					if(!material.properties[p].active)
+				for(int p = 0; p < (int)material.properties.size(); p++){
+					if(!material.properties[p].active || !material.properties[p].editable)
 						continue;
-					QString complete_filename = filename + "_" + QString::fromStdString(material.properties[p].name) + ".sli";
+					QString complete_filename = filename + "_" + QString::fromStdString(material.properties[p].short_name) + ".sli";
 					main_scenario.exportToFile(complete_filename.toStdString(), seismic_es->index, material_es->index, p);
 					std::cout << "Exported to: " << complete_filename.toStdString() << std::endl;
 					n++;
@@ -203,6 +203,8 @@ void MainWindow::addProperties(){
 	if(main_scenario.materials.size() == 0)
 		return;
 	for(MaterialProperty &property: main_scenario.materials[0].properties){
+		if(!property.editable)
+			continue;
 		QCheckBox* qcheckbox = new QCheckBox(QString::fromStdString(property.name), ui->widget_sensibilizar);
 		qcheckbox->setChecked(true);
 		ui->widget_sensibilizar->layout()->addWidget(qcheckbox);

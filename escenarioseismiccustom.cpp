@@ -4,8 +4,8 @@ EscenarioSeismicCustom::EscenarioSeismicCustom(int index, std::string n, std::st
 	name(n),
 	abbr(a)
 {
-	seismic = "0";
-	seismicv = "0";
+	seismic = 0.0;
+	seismicv = 0.0;
 	this->index = index;
 	enabled = true;
 }

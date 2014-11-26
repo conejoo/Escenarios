@@ -29,6 +29,22 @@ class Utils
 			return input.size() >= match.size()
 					&& equal(match.begin(), match.end(), input.begin());
 		}
+		static std::string removeAccented( std::string str ) {
+			std::string copy = "";
+			const char *p = str.c_str();
+			while ( (*p)!=0 ) {
+				const char*
+				//   "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ"
+				tr = "AAAAAAECEEEEIIIIDNOOOOOx0UUUUYPsaaaaaaeceeeeiiiiOnooooo/0uuuuypy";
+				unsigned char ch = (*p);
+				if ( ch >=192 ) {
+					copy += tr[ ch-192 ];
+				}else
+					copy += *p;
+				++p;
+			}
+			return copy;
+		}
 };
 
 #endif // UTILS_H

@@ -17,7 +17,7 @@ Material::Material(std::string material_string, std::string material_description
 	ss >> id;
 	ss >> tmp; // discard =
 	while(ss >> tmp){
-		std::string value;
+		double value;
 		ss >> value;
 		properties.push_back(MaterialProperty(tmp.substr(0,tmp.length()-1), value));
 	}
@@ -30,7 +30,7 @@ std::string Material::toString(int n, int property_index)
 	for(int i = 0; i < (int)properties.size(); i++){
 		MaterialProperty &property = properties[i];
 		int index = (i != property_index)?MaterialProperty::ORIGINAL_VALUE:n;
-		result << " " << property.name << " " << property.getValue(index);
+		result << " " << property.short_name << ": " << property.getValue(index);
 	}
 	return result.str();
 }
