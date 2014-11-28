@@ -29,7 +29,7 @@ class EscenarioFile
 		std::vector<Material> materials;
 		std::unordered_map<int, EscenarioSeismicCustom*> seismic_escenarios;
 		std::unordered_map<int, EscenarioMaterialCustom*> materials_escenarios;
-		std::string base_seismic, base_seismicv;
+		double base_seismic, base_seismicv;
 		int sesmic_position;
 		int sesmicv_position;
 		int material_types_position;

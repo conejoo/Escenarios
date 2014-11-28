@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     resultsprocessui.cpp \
     resultfile.cpp \
     escenarioseismiccustom.cpp \
-    escenariomaterialcustom.cpp
+    escenariomaterialcustom.cpp \
+    resultmethod.cpp
 
 HEADERS  += mainwindow.h \
     escenariofile.h \
@@ -41,7 +42,8 @@ HEADERS  += mainwindow.h \
     resultsprocessui.h \
     resultfile.h \
     escenarioseismiccustom.h \
-    escenariomaterialcustom.h
+    escenariomaterialcustom.h \
+    resultmethod.h
 
 FORMS    += mainwindow.ui \
     scenariomaterialsconfigui.ui \

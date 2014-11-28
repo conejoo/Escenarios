@@ -7,12 +7,16 @@
 class MaterialProperty
 {
 	public:
-		MaterialProperty(std::string name, std::string value);
-		std::string getValue(int n);
+		MaterialProperty(std::string name, double value);
+		double getValue(int n);
 		static const int ORIGINAL_VALUE = -1;
 		std::string name;
+		std::string short_name;
 		bool active;
-		std::unordered_map<int, std::string> values; // index
+		bool editable;
+		std::unordered_map<int, double> values; // index
+		static std::unordered_map<std::string, std::string> translate;
+		static std::unordered_map<std::string, std::string>& getTranslate();
 };
 
 #endif // MATERIALPROPERTY_H

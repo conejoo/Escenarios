@@ -72,7 +72,7 @@ void EscenarioFile::process_seismic(){
 	std::string name;
 	std::istringstream ss(sesmic);
 	ss >> name;
-	std::string value;
+	double value;
 	ss >> value;
 	base_seismic = value;
 	std::istringstream ssv(sesmicv);

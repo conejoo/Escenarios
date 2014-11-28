@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "resultmethod.h"
 
 class ResultFile
 {
@@ -14,6 +15,9 @@ class ResultFile
 		void processFileData();
 		int findLineStartingIn(const char* chars);
 		int findLineStartingIn(int pos, const char* chars);
+		int global_minimum_fs_pos;
+		int global_minimum_text_pos;
+		std::vector<ResultMethod> methods;
 };
 
 #endif // RESULTSFILE_H

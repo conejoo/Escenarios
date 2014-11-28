@@ -2,7 +2,7 @@
 #define SCENARIOMATERIALSCONFIGUI_H
 
 #include <QWidget>
-#include <QLineEdit>
+#include <QDoubleSpinBox>
 #include <vector>
 #include "material.h"
 
@@ -21,13 +21,13 @@ class ScenarioMaterialsConfigUI : public QWidget
 		void toggleProperty(int index, bool toggled);
 
 	public slots:
-		void updatePropertyValue(QString new_value);
+		void updatePropertyValue(double new_value);
 
 	private:
 		Ui::ScenarioMaterialsConfigUI *ui;
 		Material& material;
 		int material_index;
-		std::unordered_map<QLineEdit*, MaterialProperty*> line_edits_material;
+		std::unordered_map<QDoubleSpinBox*, MaterialProperty*> line_edits_material;
 };
 
 #endif // SCENARIOMATERIALSCONFIGUI_H
