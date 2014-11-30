@@ -82,7 +82,7 @@ void EscenarioFile::process_seismic(){
 	std::cout << "base_seismic " << base_seismic << std::endl;
 	std::cout << "base_seismicv " << base_seismicv << std::endl;
 }
-EscenarioSeismicCustom* EscenarioFile::createCustomSeismicScenario(int index, std::string name, std::string abbr){
+EscenarioSeismicCustom* EscenarioFile::createCustomSeismicScenario(int index, std::wstring name, std::string abbr){
 	EscenarioSeismicCustom* new_custom = new EscenarioSeismicCustom(index, name, abbr);
 	if(index == MaterialProperty::ORIGINAL_VALUE){
 		new_custom->seismic = base_seismic;
@@ -91,7 +91,7 @@ EscenarioSeismicCustom* EscenarioFile::createCustomSeismicScenario(int index, st
 	seismic_escenarios[index] = new_custom;
 	return new_custom;
 }
-EscenarioMaterialCustom* EscenarioFile::createCustomMaterialScenario(int index, std::string name, std::string abbr){
+EscenarioMaterialCustom* EscenarioFile::createCustomMaterialScenario(int index, std::wstring name, std::string abbr){
 	EscenarioMaterialCustom* new_custom = new EscenarioMaterialCustom(index, name, abbr);
 	materials_escenarios[index] = new_custom;
 	return new_custom;

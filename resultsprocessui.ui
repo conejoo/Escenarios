@@ -6,17 +6,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>620</width>
     <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Procesar resultados (.s01)</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QWidget" name="widget_2" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QLabel" name="label_resume">
+        <property name="text">
+         <string>0 Archivos cargados...</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QWidget" name="widget_archivos" native="true">
         <layout class="QVBoxLayout" name="verticalLayout_3"/>

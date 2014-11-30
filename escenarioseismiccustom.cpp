@@ -1,6 +1,6 @@
 #include "escenarioseismiccustom.h"
 
-EscenarioSeismicCustom::EscenarioSeismicCustom(int index, std::string n, std::string a):
+EscenarioSeismicCustom::EscenarioSeismicCustom(int index, std::wstring n, std::string a):
 	name(n),
 	abbr(a)
 {

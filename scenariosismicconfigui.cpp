@@ -24,7 +24,7 @@ void ScenarioSismicConfigUI::changedSeismic(){
 	scenario->seismicv = ui->lineEdit_seismicv->value();
 }
 void ScenarioSismicConfigUI::setNewName(QString newName, QString abbr){
-	scenario->name = newName.toStdString();
+	scenario->name = newName.toStdWString();
 	scenario->abbr = abbr.toStdString();
 	ui->checkBox->setText("Generar Escenario " + newName + " (" + abbr + ")");
 }

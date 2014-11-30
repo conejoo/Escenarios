@@ -5,12 +5,13 @@
 #include <sstream>
 
 ResultFile::ResultFile(std::string file):
-	filename(file)
+	filename(file.substr(file.find_last_of("\\/")+1,file.length()-file.find_last_of("\\/")-1))
 {
 	std::ifstream infile(file.c_str());
 	for(std::string line; std::getline(infile, line);)
 		lines.push_back(line);
 	processFileData();
+	processFileName();
 }
 
 
@@ -27,6 +28,23 @@ int ResultFile::findLineStartingIn(int pos, const char* chars){
 	return -1;
 }
 
+void ResultFile::processFileName(){
+	std::string filename_no_ext = Utils::removeFileExtension(filename);
+	std::vector<std::string> file_split = Utils::split(filename_no_ext, '_');
+	if(file_split.size()>0){
+		sensible = file_split[file_split.size()-1];
+		file_split.pop_back();
+	}
+	if(file_split.size()>0){
+		material_scenario = file_split[file_split.size()-1];
+		file_split.pop_back();
+	}
+	if(file_split.size()>0){
+		seismic_scenario = file_split[file_split.size()-1];
+		file_split.pop_back();
+	}
+}
+
 void ResultFile::processFileData(){
 	global_minimum_fs_pos = findLineStartingIn(0, "* Global Minimum FS");
 	global_minimum_text_pos = findLineStartingIn(global_minimum_fs_pos, "* Global Minimum Text");
@@ -39,11 +57,13 @@ void ResultFile::processFileData(){
 		std::stringstream stream(lines[global_minimum_fs_pos + 1 + i]);
 		for(int j = 0; j < 8; j++)
 			stream >> token;
+		std::string fs = token;
 		std::string name = "";
 		while(stream >> token)
 			name += token + " ";
 		name = Utils::trim(name);
 		ResultMethod method(name);
+		method.values["FS"] = std::pair<std::string, std::string>(fs,"");
 		methods.push_back(method);
 	}
 	int start = global_minimum_text_pos + 1;

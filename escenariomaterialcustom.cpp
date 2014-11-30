@@ -1,6 +1,6 @@
 #include "escenariomaterialcustom.h"
 
-EscenarioMaterialCustom::EscenarioMaterialCustom(int index, std::string n, std::string a):
+EscenarioMaterialCustom::EscenarioMaterialCustom(int index, std::wstring n, std::string a):
 	name(n),
 	abbr(a)
 {

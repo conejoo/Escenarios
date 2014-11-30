@@ -6,9 +6,9 @@
 class EscenarioMaterialCustom
 {
 	public:
-		EscenarioMaterialCustom(int index, std::string n, std::string a);
+		EscenarioMaterialCustom(int index, std::wstring n, std::string a);
 		int index;
-		std::string name;
+		std::wstring name;
 		std::string abbr;
 		bool enabled;
 };

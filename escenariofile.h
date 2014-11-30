@@ -15,8 +15,8 @@ class EscenarioFile
 		EscenarioFile();
 		EscenarioFile(std::string filename);
 		virtual ~EscenarioFile();
-		EscenarioSeismicCustom* createCustomSeismicScenario(int index, std::string name, std::string abbr);
-		EscenarioMaterialCustom* createCustomMaterialScenario(int index, std::string name, std::string abbr);
+		EscenarioSeismicCustom* createCustomSeismicScenario(int index, std::wstring name, std::string abbr);
+		EscenarioMaterialCustom* createCustomMaterialScenario(int index, std::wstring name, std::string abbr);
 		void deleteSeismicScenario(int index);
 		void deleteMaterialScenario(int index);
 		void exportToFile(std::string filename, int seismic_index, int material_index, int property_index);

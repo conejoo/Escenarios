@@ -12,8 +12,9 @@
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow),
+	main_scenario(),
 	scenarios_config(this),
-	result_process_ui(this)
+	result_process_ui(main_scenario, this)
 {
 	ui->setupUi(this);
 	this->showMaximized();
@@ -106,6 +107,7 @@ void MainWindow::openScenario(std::string filename){
 	addProperties();
 	addMaterials();
 	scenarios_config.setScenarioFile(&main_scenario);
+	result_process_ui.setEscenarioFile(main_scenario);
 }
 
 void MainWindow::clearLayout(QLayout *layout){
@@ -123,7 +125,7 @@ void MainWindow::clearLayout(QLayout *layout){
 }
 
 void MainWindow::addMaterialScenario(int index, QString name, QString abbr){
-	main_scenario.createCustomMaterialScenario(index, name.toStdString(), abbr.toStdString());
+	main_scenario.createCustomMaterialScenario(index, name.toStdWString(), abbr.toStdString());
 	for(MaterialConfigUI* config: materials_ui)
 		config->escenarioAdded(index, name);
 	QCheckBox* qcheckbox = new QCheckBox(name + " (" + abbr + ")", ui->groupBox_escenarios);
@@ -137,7 +139,7 @@ void MainWindow::addMaterialScenario(int index, QString name, QString abbr){
 }
 
 void MainWindow::addSismicScenario(int index, QString name, QString abbr){
-	EscenarioSeismicCustom* custom = main_scenario.createCustomSeismicScenario(index, name.toStdString(), abbr.toStdString());
+	EscenarioSeismicCustom* custom = main_scenario.createCustomSeismicScenario(index, name.toStdWString(), abbr.toStdString());
 	main_scenario.seismic_escenarios[index] = custom;
 	ScenarioSismicConfigUI* config = new ScenarioSismicConfigUI(this, custom);
 	config->setNewName(name, abbr);
@@ -151,13 +153,13 @@ void MainWindow::changedMaterialScenarioName(int index, QString new_name){
 		config->escenarioChangedName(index, new_name);
 	QCheckBox* checkbox = index_qcheckbox_material_scenario[index];
 	checkbox->setText(new_name + " (" + QString::fromStdString(custom->abbr) + ")");
-	custom->name = new_name.toStdString();
+	custom->name = new_name.toStdWString();
 }
 
 void MainWindow::changedMaterialScenarioAbbr(int index, QString abbr){
 	EscenarioMaterialCustom* custom = main_scenario.materials_escenarios[index];
 	QCheckBox* checkbox = index_qcheckbox_material_scenario[index];
-	checkbox->setText(QString::fromStdString(custom->name) + " ("+abbr+")");
+	checkbox->setText(QString::fromStdWString(custom->name) + " ("+abbr+")");
 	custom->abbr = abbr.toStdString();
 }
 
@@ -188,7 +190,7 @@ void MainWindow::changedSismicName(int index, QString new_name){
 void MainWindow::changedSismicAbbr(int index, QString abbr){
 	EscenarioSeismicCustom* custom = main_scenario.seismic_escenarios[index];
 	ScenarioSismicConfigUI* config = custom_seismic_schenarios_ui[index];
-	config->setNewName(QString::fromStdString(custom->name), abbr);
+	config->setNewName(QString::fromStdWString(custom->name), abbr);
 }
 
 void MainWindow::addMaterials(){
