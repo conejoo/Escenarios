@@ -23,6 +23,7 @@ EscenarioFile::EscenarioFile(std::string filename):
 	for(Material m: materials)
 		std::cout << m.toString() << std::endl;
 }
+
 EscenarioFile::~EscenarioFile()
 {
 	for(auto& it: seismic_escenarios)
@@ -30,7 +31,6 @@ EscenarioFile::~EscenarioFile()
 	for(auto& it: materials_escenarios)
 		delete it.second;
 }
-
 
 int EscenarioFile::find_empty_line(int pos){
 	for(unsigned int p = pos; p < lines.size(); p++)
@@ -82,6 +82,7 @@ void EscenarioFile::process_seismic(){
 	std::cout << "base_seismic " << base_seismic << std::endl;
 	std::cout << "base_seismicv " << base_seismicv << std::endl;
 }
+
 EscenarioSeismicCustom* EscenarioFile::createCustomSeismicScenario(int index, std::wstring name, std::string abbr){
 	EscenarioSeismicCustom* new_custom = new EscenarioSeismicCustom(index, name, abbr);
 	if(index == MaterialProperty::ORIGINAL_VALUE){
@@ -91,6 +92,7 @@ EscenarioSeismicCustom* EscenarioFile::createCustomSeismicScenario(int index, st
 	seismic_escenarios[index] = new_custom;
 	return new_custom;
 }
+
 EscenarioMaterialCustom* EscenarioFile::createCustomMaterialScenario(int index, std::wstring name, std::string abbr){
 	EscenarioMaterialCustom* new_custom = new EscenarioMaterialCustom(index, name, abbr);
 	materials_escenarios[index] = new_custom;

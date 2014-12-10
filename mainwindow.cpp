@@ -39,11 +39,13 @@ MainWindow::~MainWindow()
 
 void MainWindow::openScenarioPromp(){
 	QString filename = QFileDialog::getOpenFileName(this,
-													("Open File"), "",
-													"Scenarios (*.sli)");
+													("Abrir Escenario (.sli)"), "",
+													"Scenarios (*.sli);;Todos los archivos (*)");
 	if(filename.size() == 0)
 		return; // cancel
 	openScenario(filename.toStdString());
+	result_process_ui.resetFiles();
+	ui->statusBar->showMessage("Archivo cargado: " + filename, 20000);
 }
 
 void MainWindow::exportScenariosPromp(){

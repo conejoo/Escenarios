@@ -25,14 +25,20 @@ class ResultsProcessUI : public QWidget
 		void resetFiles();
 		void loadFilesPromp();
 		void exportResultsPromp();
+		void removeResultFile();
+		void addResultFile();
+		void addAllResultFiles();
+		void removeAllResultFiles();
 
 	private:
+		void countAddedFiles();
 		std::wstring translateMaterialScenario(std::string abbr);
 		std::wstring translateSeismicScenario(std::string abbr);
 		std::wstring localTranslate(std::string abbr);
 		std::wstring toWString(std::string);
 		Ui::ResultsProcessUI *ui;
 		std::vector<ResultFile*> results;
+		std::unordered_map<std::string, ResultFile*> results_map;
 		std::string addUnit(const char* name);
 		std::unordered_map<std::string, std::wstring> translation_scenario;
 		EscenarioFile& escenarios;

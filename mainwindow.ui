@@ -16,6 +16,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="statusTip">
+   <string/>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -31,7 +34,7 @@
       </property>
       <widget class="QWidget" name="tab_sismicas">
        <attribute name="title">
-        <string>Variables Sismicas</string>
+        <string>Variables Sísmicas</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
@@ -222,7 +225,7 @@
   </action>
   <action name="actionProcesar_resultados">
    <property name="text">
-    <string>Procesar resultados...</string>
+    <string>Procesar Resultados...</string>
    </property>
   </action>
  </widget>

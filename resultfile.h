@@ -15,6 +15,7 @@ class ResultFile
 		std::string material_scenario;
 		std::string sensible;
 		std::vector<ResultMethod> methods;
+		bool included;
 	private:
 		void processFileData();
 		void processFileName();

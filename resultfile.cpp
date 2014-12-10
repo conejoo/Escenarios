@@ -7,6 +7,7 @@
 ResultFile::ResultFile(std::string file):
 	filename(file.substr(file.find_last_of("\\/")+1,file.length()-file.find_last_of("\\/")-1))
 {
+	included = false;
 	std::ifstream infile(file.c_str());
 	for(std::string line; std::getline(infile, line);)
 		lines.push_back(line);
@@ -31,18 +32,16 @@ int ResultFile::findLineStartingIn(int pos, const char* chars){
 void ResultFile::processFileName(){
 	std::string filename_no_ext = Utils::removeFileExtension(filename);
 	std::vector<std::string> file_split = Utils::split(filename_no_ext, '_');
-	if(file_split.size()>0){
-		sensible = file_split[file_split.size()-1];
-		file_split.pop_back();
+	if(file_split.size() < 3){
+		std::cout << "No se pudo procesar nombre de archivo: " << filename << std::endl;
+		return;
 	}
-	if(file_split.size()>0){
-		material_scenario = file_split[file_split.size()-1];
-		file_split.pop_back();
-	}
-	if(file_split.size()>0){
-		seismic_scenario = file_split[file_split.size()-1];
-		file_split.pop_back();
-	}
+	sensible = file_split[file_split.size()-1];
+	file_split.pop_back();
+	material_scenario = file_split[file_split.size()-1];
+	file_split.pop_back();
+	seismic_scenario = file_split[file_split.size()-1];
+	file_split.pop_back();
 }
 
 void ResultFile::processFileData(){
