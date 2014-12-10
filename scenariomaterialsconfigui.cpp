@@ -19,11 +19,11 @@ ScenarioMaterialsConfigUI::ScenarioMaterialsConfigUI(QWidget *parent, int index,
 		property.values[material_index] = material_value;
 		QDoubleSpinBox* line_edit = new QDoubleSpinBox();
 		line_edit->setMinimum(0.0);
-		line_edit->setValue(material_value);
 		if(property.short_name.compare("phi") == 0)
 			line_edit->setMaximum(90.0);
 		else
 			line_edit->setMaximum(10000000.0);
+		line_edit->setValue(material_value);
 		//QString::number(material_value)
 		//line_edit->setReadOnly(read_only);
 		line_edits_material[line_edit] = &property;
