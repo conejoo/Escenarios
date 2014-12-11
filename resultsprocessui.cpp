@@ -12,7 +12,8 @@
 ResultsProcessUI::ResultsProcessUI(EscenarioFile& es, QWidget *parent) :
 	QWidget(parent, Qt::Tool| Qt::Window | Qt::CustomizeWindowHint| Qt::WindowMinimizeButtonHint |Qt::WindowCloseButtonHint),
 	ui(new Ui::ResultsProcessUI),
-	escenarios(es)
+	escenarios(es),
+	custom_file_dialog(this)
 {
 	ui->setupUi(this);
 	connect(ui->pushButton_export, SIGNAL(clicked()), this, SLOT(exportResultsPromp()));
@@ -22,6 +23,7 @@ ResultsProcessUI::ResultsProcessUI(EscenarioFile& es, QWidget *parent) :
 	connect(ui->pushButton_remove, SIGNAL(clicked()), this, SLOT(removeResultFile()));
 	connect(ui->pushButton_add_all, SIGNAL(clicked()), this, SLOT(addAllResultFiles()));
 	connect(ui->pushButton_remove_all, SIGNAL(clicked()), this, SLOT(removeAllResultFiles()));
+	connect(&custom_file_dialog, SIGNAL(newFileSelection(QStringList)), this, SLOT(openProcessFiles(QStringList)));
 	translation_scenario["min"] = L"Escenario Mínimo";
 	translation_scenario["med"] = L"Escenario Medio";
 	translation_scenario["max"] = L"Escenario Máximo";
@@ -50,11 +52,7 @@ void ResultsProcessUI::resetFiles(){
 	ui->label_resume->setText(QString::number(results.size()) + " Archivos cargados...");
 	countAddedFiles();
 }
-
-void ResultsProcessUI::loadFilesPromp(){
-	QStringList filenames = QFileDialog::getOpenFileNames(this,
-													("Abrir resultados (.s01)"), "",
-													"Resultados (*.s01);;Todos los archivos (*)");
+void ResultsProcessUI::openProcessFiles(const QStringList & filenames){
 	if(filenames.size() == 0)
 		return; // cancel
 	for(QString filename: filenames){
@@ -71,6 +69,15 @@ void ResultsProcessUI::loadFilesPromp(){
 	}
 	ui->label_resume->setText(QString::number(results.size()) + " Archivos cargados...");
 	countAddedFiles();
+}
+
+void ResultsProcessUI::loadFilesPromp(){
+	custom_file_dialog.openDialog();
+	return;
+	QStringList filenames = QFileDialog::getOpenFileNames(this,
+													("Abrir resultados (.s01)"), "",
+													"Resultados (*.s01);;Todos los archivos (*)");
+
 }
 
 void ResultsProcessUI::addResultFile(){
@@ -120,7 +127,6 @@ void ResultsProcessUI::exportResultsPromp(){
 		msgBox.exec();
 		return;
 	}
-
 	QString filename = QFileDialog::getSaveFileName(this, "Save file", "",
 											   "CSV File (*.csv);;All files (*.*)");
 	if(filename.size() == 0)

@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include "escenariofile.h"
+#include "customfiledialognewlayout.h"
 
 class ResultFile;
 
@@ -29,6 +30,7 @@ class ResultsProcessUI : public QWidget
 		void addResultFile();
 		void addAllResultFiles();
 		void removeAllResultFiles();
+		void openProcessFiles(const QStringList & filenames);
 
 	private:
 		void countAddedFiles();
@@ -42,6 +44,7 @@ class ResultsProcessUI : public QWidget
 		std::string addUnit(const char* name);
 		std::unordered_map<std::string, std::wstring> translation_scenario;
 		EscenarioFile& escenarios;
+		CustomFileDialogNewLayout custom_file_dialog;
 };
 
 #endif // RESULTSPROCESSUI_H
