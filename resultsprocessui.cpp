@@ -19,10 +19,6 @@ ResultsProcessUI::ResultsProcessUI(EscenarioFile& es, QWidget *parent) :
 	connect(ui->pushButton_export, SIGNAL(clicked()), this, SLOT(exportResultsPromp()));
 	connect(ui->pushButton_reset, SIGNAL(clicked()), this, SLOT(resetFiles()));
 	connect(ui->pushButton_load, SIGNAL(clicked()), this, SLOT(loadFilesPromp()));
-	connect(ui->pushButton_add, SIGNAL(clicked()), this, SLOT(addResultFile()));
-	connect(ui->pushButton_remove, SIGNAL(clicked()), this, SLOT(removeResultFile()));
-	connect(ui->pushButton_add_all, SIGNAL(clicked()), this, SLOT(addAllResultFiles()));
-	connect(ui->pushButton_remove_all, SIGNAL(clicked()), this, SLOT(removeAllResultFiles()));
 	connect(&custom_file_dialog, SIGNAL(newFileSelection(QStringList)), this, SLOT(openProcessFiles(QStringList)));
 	translation_scenario["min"] = L"Escenario Mínimo";
 	translation_scenario["med"] = L"Escenario Medio";
@@ -46,7 +42,6 @@ void ResultsProcessUI::resetFiles(){
 	for(ResultFile* result: results)
 		delete result;
 	results.clear();
-	ui->listWidget_added->clear();
 	ui->listWidget_not_added->clear();
 	results_map.clear();
 	ui->label_resume->setText(QString::number(results.size()) + " Archivos cargados...");
@@ -81,43 +76,43 @@ void ResultsProcessUI::loadFilesPromp(){
 }
 
 void ResultsProcessUI::addResultFile(){
-	QList<QListWidgetItem*> selected_list = ui->listWidget_not_added->selectedItems();
-	for(QListWidgetItem* item: selected_list){
-		QString filename = item->text();
-		std::cout << "Added to list: " << filename.toStdString() << std::endl;
-		ui->listWidget_not_added->removeItemWidget(item);
-		ui->listWidget_added->addItem(filename);
-		results_map[filename.toStdString()]->included = true;
-		delete item;
-	}
-	if(ui->listWidget_not_added->count() > 0)
-		ui->listWidget_not_added->item(0)->setSelected(true);
-	countAddedFiles();
+//	QList<QListWidgetItem*> selected_list = ui->listWidget_not_added->selectedItems();
+//	for(QListWidgetItem* item: selected_list){
+//		QString filename = item->text();
+//		std::cout << "Added to list: " << filename.toStdString() << std::endl;
+//		ui->listWidget_not_added->removeItemWidget(item);
+//		ui->listWidget_added->addItem(filename);
+//		results_map[filename.toStdString()]->included = true;
+//		delete item;
+//	}
+//	if(ui->listWidget_not_added->count() > 0)
+//		ui->listWidget_not_added->item(0)->setSelected(true);
+//	countAddedFiles();
 }
 
 void ResultsProcessUI::removeResultFile(){
-	QList<QListWidgetItem*> selected_list = ui->listWidget_added->selectedItems();
-	for(QListWidgetItem* item: selected_list){
-		QString filename = item->text();
-		std::cout << "Removed from list: " << filename.toStdString() << std::endl;
-		ui->listWidget_added->removeItemWidget(item);
-		ui->listWidget_not_added->addItem(filename);
-		results_map[filename.toStdString()]->included = false;
-		delete item;
-	}
-	if(ui->listWidget_added->count() > 0)
-		ui->listWidget_added->item(0)->setSelected(true);
-	countAddedFiles();
+//	QList<QListWidgetItem*> selected_list = ui->listWidget_added->selectedItems();
+//	for(QListWidgetItem* item: selected_list){
+//		QString filename = item->text();
+//		std::cout << "Removed from list: " << filename.toStdString() << std::endl;
+//		ui->listWidget_added->removeItemWidget(item);
+//		ui->listWidget_not_added->addItem(filename);
+//		results_map[filename.toStdString()]->included = false;
+//		delete item;
+//	}
+//	if(ui->listWidget_added->count() > 0)
+//		ui->listWidget_added->item(0)->setSelected(true);
+//	countAddedFiles();
 }
 
 void ResultsProcessUI::addAllResultFiles(){
-	ui->listWidget_not_added->selectAll();
-	this->addResultFile();
+//	ui->listWidget_not_added->selectAll();
+//	this->addResultFile();
 }
 
 void ResultsProcessUI::removeAllResultFiles(){
-	ui->listWidget_added->selectAll();
-	this->removeResultFile();
+//	ui->listWidget_added->selectAll();
+//	this->removeResultFile();
 }
 
 void ResultsProcessUI::exportResultsPromp(){
@@ -146,8 +141,8 @@ void ResultsProcessUI::exportResultsPromp(){
 	myfile << toWString(addUnit("Driving Horizontal Force")) << ",";
 	myfile << toWString(addUnit("Total Slice Area")) << std::endl;
 	for(ResultFile* rs: results){
-		if(!rs->included)
-			continue;
+//		if(!rs->included)
+//			continue;
 		for(ResultMethod& method: rs->methods){
 			myfile << toWString(rs->filename) << ",";
 			myfile << toWString(method.name) << ",";
@@ -211,8 +206,8 @@ std::wstring ResultsProcessUI::toWString(std::string s){
 }
 
 void ResultsProcessUI::countAddedFiles(){
-	int not_added = ui->listWidget_not_added->count();
-	int added = ui->listWidget_added->count();
-	ui->label_added_files->setText(QString::number(added) + " Archivos agregados");
-	ui->label_not_added_files->setText(QString::number(not_added) + " Archivos no agregados");
+//	int not_added = ui->listWidget_not_added->count();
+//	int added = ui->listWidget_added->count();
+//	ui->label_added_files->setText(QString::number(added) + " Archivos agregados");
+//	ui->label_not_added_files->setText(QString::number(not_added) + " Archivos no agregados");
 }

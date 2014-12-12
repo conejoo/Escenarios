@@ -29,6 +29,7 @@ CustomFileDialogNewLayout::~CustomFileDialogNewLayout()
 }
 
 void CustomFileDialogNewLayout::processNewFiles(){
+	this->close();
 	emit newFileSelection(filenames.toList());
 }
 
