@@ -16,6 +16,9 @@ CustomFileDialogNewLayout::CustomFileDialogNewLayout(QWidget *parent) :
 	file_dialog.setFileMode(QFileDialog::ExistingFiles);
 	file_dialog.setLabelText(QFileDialog::Accept, "Agregar");
 	file_dialog.setLabelText(QFileDialog::Reject, "Cancelar");
+	file_dialog.setLabelText(QFileDialog::LookIn, "Buscar en");
+	file_dialog.setLabelText(QFileDialog::FileName, "Archivo");
+	file_dialog.setLabelText(QFileDialog::FileType, "Tipo de archivo");
 	//file_dialog.open(this, SLOT(openProcessFiles(const QStringList &)));
 	connect(&file_dialog, SIGNAL(filesSelected(QStringList)), this, SLOT(addFilesToList(const QStringList &)));
 	connect(ui->pushButton_quitar, SIGNAL(clicked()), this, SLOT(removeFilenames()));
