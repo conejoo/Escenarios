@@ -3,6 +3,7 @@
 #include <iostream>
 #include <QCheckBox>
 #include <QMessageBox>
+#include <fstream>
 #include "ui_mainwindow.h"
 #include "escenariofile.h"
 #include "materialconfigui.h"
@@ -56,6 +57,9 @@ void MainWindow::exportScenariosPromp(){
 	if(dir.size() == 0 || main_scenario.materials.size() == 0)
 		return; // cancel
 	int n = 0;
+	std::ofstream _parametros;
+	std::string _par_filename = dir.toStdString() + "/" + main_scenario.filename + "_parametros.sli";
+	_parametros.open(_par_filename.c_str());
 	for (const auto& ite: main_scenario.materials_escenarios) {
 		EscenarioMaterialCustom* material_es = ite.second;
 		if(!material_es->enabled)
@@ -79,6 +83,17 @@ void MainWindow::exportScenariosPromp(){
 					main_scenario.exportToFile(complete_filename.toStdString(), seismic_es->index, material_es->index, p);
 					std::cout << "Exported to: " << complete_filename.toStdString() << std::endl;
 					n++;
+					_parametros << complete_filename.right(complete_filename.length()-dir.length()-1).toStdString() << ",";
+					_parametros << seismic_es->seismic << ",";
+					_parametros << seismic_es->seismicv << ",";
+					_parametros << material.properties[p].short_name << ",";
+					for(int p2 = 0; p2 < (int)material.properties.size(); p2++){
+						int p_index = MaterialProperty::ORIGINAL_VALUE;
+						if(p == p2)
+							p_index = p;
+						_parametros << material.properties[p2].values[p_index] << ",";
+					}
+					_parametros << std::endl;
 				}
 			}else{
 				filename = filename + ".sli";
@@ -88,6 +103,7 @@ void MainWindow::exportScenariosPromp(){
 			}
 		}
 	}
+	_parametros.close();
 	QMessageBox msgBox;
 	msgBox.setText(QString::number(n) +
 				   " nuevos escenarios han sido guardados en la carpeta " +

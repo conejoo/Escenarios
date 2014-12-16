@@ -42,10 +42,10 @@ void ScenariosConfigUI::setScenarioFile(EscenarioFile* file)
 	remove_buttons_sismic.clear();
 	line_edits_sismic_inv.clear();
 	int index_base = MaterialProperty::ORIGINAL_VALUE;
-	addMaterialScenario(1, QString("Escenario Mínimo"), QString("min"));
 	addMaterialScenario(index_base, QString("Escenario Medio"), QString("med"));
+	addMaterialScenario(1, QString("Escenario Mínimo"), QString("min"));
 	addMaterialScenario(3, QString("Escenario Máximo"), QString("max"));
-	addSismicScenario(index_base, QString("Base"), QString("base"));
+	addSismicScenario(index_base, QString("Estático"), QString("base"));
 	addSismicScenario(7, QString("Sismo Operacional"), QString("op"));
 	addSismicScenario(8, QString("Abandono"), QString("ab"));
 	ui->pushButton_new_material->setEnabled(true);
@@ -70,6 +70,10 @@ void ScenariosConfigUI::addMaterialScenario(int index, QString name, QString abb
 	bool original = index == MaterialProperty::ORIGINAL_VALUE;
 	QLineEdit* line_edit = new QLineEdit(name);
 	QLineEdit* line_edit_abbr = new QLineEdit(abbr);
+	if(original){
+		line_edit_abbr->setStyleSheet("QLineEdit { color : blue; }");
+		line_edit->setStyleSheet("QLineEdit { color : blue; }");
+	}
 	QPushButton* button = new QPushButton(QString("Remover"));
 	button->setEnabled(!original);
 	connect(button, SIGNAL(clicked()), this, SLOT(removeMaterialScenario()));

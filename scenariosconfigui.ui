@@ -18,30 +18,6 @@
     <widget class="QWidget" name="widget_3" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QGroupBox" name="groupBox">
-        <property name="title">
-         <string>Escenarios de Materiales</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <item>
-          <widget class="QWidget" name="widget_material_configs" native="true">
-           <layout class="QGridLayout" name="gridLayout_2"/>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_new_material">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Agregar nuevo escenario</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
        <widget class="QGroupBox" name="groupBox_2">
         <property name="title">
          <string>Escenarios Sísmicos</string>
@@ -54,6 +30,30 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_new_sismic">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Agregar nuevo escenario</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
+         <string>Escenarios de Materiales</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QWidget" name="widget_material_configs" native="true">
+           <layout class="QGridLayout" name="gridLayout_2"/>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_new_material">
            <property name="enabled">
             <bool>false</bool>
            </property>

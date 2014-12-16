@@ -2,6 +2,7 @@
 #include "ui_scenariomaterialsconfigui.h"
 #include "materialconfigui.h"
 #include "materialproperty.h"
+#include <QLabel>
 
 ScenarioMaterialsConfigUI::ScenarioMaterialsConfigUI(QWidget *parent, int index, Material& material) :
 	QWidget(parent),
@@ -27,6 +28,8 @@ ScenarioMaterialsConfigUI::ScenarioMaterialsConfigUI(QWidget *parent, int index,
 		//QString::number(material_value)
 		//line_edit->setReadOnly(read_only);
 		line_edits_material[line_edit] = &property;
+		if(material_index == MaterialProperty::ORIGINAL_VALUE)
+			ui->groupBox->setStyleSheet("QGroupBox, QLabel { color : blue; }");
 		grid_layout->addRow(QString::fromStdString(property.name), line_edit);
 		connect(line_edit, SIGNAL(valueChanged(double)), this, SLOT(updatePropertyValue(double)));
 	}

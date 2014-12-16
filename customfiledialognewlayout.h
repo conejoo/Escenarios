@@ -20,7 +20,10 @@ class CustomFileDialogNewLayout : public QWidget
 
 	public slots:
 		void addFilesToList(const QStringList & selected);
+		void addFilesToListArrow();
+		void addAllFilesToListArrow();
 		void removeFilenames();
+		void removeAllFilenames();
 		void openDialog();
 		void processNewFiles();
 

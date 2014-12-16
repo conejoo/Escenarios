@@ -28,6 +28,109 @@
     </widget>
    </item>
    <item>
+    <widget class="QWidget" name="widget_3" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_add_all">
+        <property name="maximumSize">
+         <size>
+          <width>35</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>&gt;&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_add_one">
+        <property name="maximumSize">
+         <size>
+          <width>35</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_remove_one">
+        <property name="maximumSize">
+         <size>
+          <width>35</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>&lt;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_remove_all">
+        <property name="maximumSize">
+         <size>
+          <width>35</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>&lt;&lt;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+     <zorder>widget_dialog</zorder>
+     <zorder>pushButton_add_all</zorder>
+     <zorder>pushButton_add_one</zorder>
+     <zorder>pushButton_remove_one</zorder>
+     <zorder>pushButton_remove_all</zorder>
+     <zorder>verticalSpacer</zorder>
+     <zorder>verticalSpacer_2</zorder>
+    </widget>
+   </item>
+   <item>
     <widget class="QWidget" name="widget" native="true">
      <property name="maximumSize">
       <size>
