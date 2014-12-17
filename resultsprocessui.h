@@ -35,6 +35,8 @@ class ResultsProcessUI : public QWidget
 	private:
 		void countAddedFiles();
 		std::wstring translateMaterialScenario(std::string abbr);
+		bool isMedMaterialScenario(std::string abbr);
+		bool areTranslatables(std::string abbr_se, std::string abbr_mat);
 		std::wstring translateSeismicScenario(std::string abbr);
 		std::wstring localTranslate(std::string abbr);
 		std::wstring toWString(std::string);

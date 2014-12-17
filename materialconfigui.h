@@ -22,6 +22,7 @@ class MaterialConfigUI : public QWidget
 		void escenarioChangedName(int index, QString newname);
 		void toggleMaterial(int index, bool show);
 		void toggleProperty(int index, bool toggled);
+		void applyPercentaje(double percentaje, int scenario_index, int property_index);
 
 	private:
 		Ui::MaterialConfigUI *ui;

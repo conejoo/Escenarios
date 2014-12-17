@@ -23,7 +23,7 @@ ResultsProcessUI::ResultsProcessUI(EscenarioFile& es, QWidget *parent) :
 	translation_scenario["min"] = L"Escenario Mínimo";
 	translation_scenario["med"] = L"Escenario Medio";
 	translation_scenario["max"] = L"Escenario Máximo";
-	translation_scenario["base"] = L"Base";
+	translation_scenario["base"] = L"Estático";
 	translation_scenario["op"] = L"Sismo Operacional";
 	translation_scenario["ab"] = L"Abandono";
 	countAddedFiles();
@@ -146,9 +146,23 @@ void ResultsProcessUI::exportResultsPromp(){
 		for(ResultMethod& method: rs->methods){
 			myfile << toWString(rs->filename) << ",";
 			myfile << toWString(method.name) << ",";
-			myfile << translateSeismicScenario(rs->seismic_scenario) << ",";
-			myfile << toWString(rs->sensible) << ",";
-			myfile << translateMaterialScenario(rs->material_scenario) << ",";
+			if(isMedMaterialScenario(rs->sensible)){
+				if(areTranslatables(rs->material_scenario, rs->sensible)){
+					myfile << translateSeismicScenario(rs->material_scenario) << ",";
+					myfile << "" << ",";
+					myfile << translateMaterialScenario(rs->sensible) << ",";
+				}else{
+					myfile  << ",,,";
+				}
+			}else{
+				if(areTranslatables(rs->seismic_scenario, rs->material_scenario)){
+					myfile << translateSeismicScenario(rs->seismic_scenario) << ",";
+					myfile << toWString(rs->sensible) << ",";
+					myfile << translateMaterialScenario(rs->material_scenario) << ",";
+				}else{
+					myfile  << ",,,";
+				}
+			}
 			myfile << toWString(method.getValue("FS").first) << ",";
 			myfile << toWString(method.getValue("Resisting Moment").first) << ",";
 			myfile << toWString(method.getValue("Driving Moment").first) << ",";
@@ -183,6 +197,39 @@ std::wstring ResultsProcessUI::translateMaterialScenario(std::string abbr){
 	return localTranslate(abbr);
 }
 
+bool ResultsProcessUI::isMedMaterialScenario(std::string abbr){
+	for(const auto& it: escenarios.materials_escenarios){
+		EscenarioMaterialCustom* material_es = it.second;
+		if((material_es->abbr.compare(abbr) == 0 && material_es->index == MaterialProperty::ORIGINAL_VALUE)){
+			return true;
+		}
+	}
+	return abbr.compare("med") == 0;
+}
+
+bool ResultsProcessUI::areTranslatables(std::string abbr_se, std::string abbr_mat){
+	bool seis_tras = translation_scenario.find(abbr_se) != translation_scenario.end();
+	bool mat_tras = translation_scenario.find(abbr_mat) != translation_scenario.end();
+	if(seis_tras && mat_tras)
+		return true;
+	for(const auto& it: escenarios.materials_escenarios){
+		EscenarioMaterialCustom* material_es = it.second;
+		if((material_es->abbr.compare(abbr_mat) == 0) ||
+				( translation_scenario.find(abbr_mat) != translation_scenario.end())){
+			mat_tras = true;
+			break;
+		}
+	}
+	for(const auto& it: escenarios.seismic_escenarios){
+		EscenarioSeismicCustom* material_es = it.second;
+		if((material_es->abbr.compare(abbr_se) == 0) ||
+				( translation_scenario.find(abbr_se) != translation_scenario.end())){
+			seis_tras = true;
+			break;
+		}
+	}
+	return seis_tras && mat_tras;
+}
 
 std::wstring ResultsProcessUI::translateSeismicScenario(std::string abbr){
 	for(const auto& it: escenarios.seismic_escenarios){

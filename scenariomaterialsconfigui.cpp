@@ -2,6 +2,7 @@
 #include "ui_scenariomaterialsconfigui.h"
 #include "materialconfigui.h"
 #include "materialproperty.h"
+#include <iostream>
 #include <QLabel>
 
 ScenarioMaterialsConfigUI::ScenarioMaterialsConfigUI(QWidget *parent, int index, Material& material) :
@@ -28,6 +29,7 @@ ScenarioMaterialsConfigUI::ScenarioMaterialsConfigUI(QWidget *parent, int index,
 		//QString::number(material_value)
 		//line_edit->setReadOnly(read_only);
 		line_edits_material[line_edit] = &property;
+		property_line_edit[&property] = line_edit;
 		if(material_index == MaterialProperty::ORIGINAL_VALUE)
 			ui->groupBox->setStyleSheet("QGroupBox, QLabel { color : blue; }");
 		grid_layout->addRow(QString::fromStdString(property.name), line_edit);
@@ -45,7 +47,7 @@ ScenarioMaterialsConfigUI::~ScenarioMaterialsConfigUI()
 void ScenarioMaterialsConfigUI::toggleProperty(int index, bool toggled){
 	QFormLayout * grid_layout = qobject_cast<QFormLayout *>(ui->groupBox->layout());
 	grid_layout->itemAt(index, QFormLayout::FieldRole)->widget()->setEnabled(toggled);
-	//grid_layout->itemAt(index, QFormLayout::LabelRole)->widget()->setVisible(toggled);
+	grid_layout->itemAt(index, QFormLayout::LabelRole)->widget()->setEnabled(toggled);
 }
 
 void ScenarioMaterialsConfigUI::updatePropertyValue(double new_value){
@@ -55,4 +57,15 @@ void ScenarioMaterialsConfigUI::updatePropertyValue(double new_value){
 }
 void ScenarioMaterialsConfigUI::setName(QString name){
 	ui->groupBox->setTitle(name);
+}
+void ScenarioMaterialsConfigUI::applyPercentaje(double percentaje, int property_index){
+	MaterialProperty& property = material.properties[property_index];
+	int orig_index = MaterialProperty::ORIGINAL_VALUE;
+	double new_value = property.values[orig_index];
+	new_value += new_value*(percentaje/100.0);
+	QDoubleSpinBox* spin_box = property_line_edit[&property];
+	if(spin_box){
+		spin_box->setValue(new_value);
+		property.values[material_index] = spin_box->value();
+	}
 }

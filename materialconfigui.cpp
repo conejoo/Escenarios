@@ -1,6 +1,7 @@
 #include "materialconfigui.h"
 #include "ui_materialconfigui.h"
 #include <QLabel>
+#include <iostream>
 
 MaterialConfigUI::MaterialConfigUI(QWidget *parent, Material& material) :
 	QWidget(parent),
@@ -45,5 +46,12 @@ void MaterialConfigUI::toggleMaterial(int index, bool show){
 	ScenarioMaterialsConfigUI* config = material_scenarios[index];
 	if(config)
 		config->setVisible(show);
+}
+
+void MaterialConfigUI::applyPercentaje(double percentaje, int scenario_index, int property_index){
+	ScenarioMaterialsConfigUI* config = material_scenarios[scenario_index];
+	if(config){
+		config->applyPercentaje(percentaje, property_index);
+	}
 }
 

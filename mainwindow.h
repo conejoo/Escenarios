@@ -4,8 +4,10 @@
 #include "escenariofile.h"
 #include <QMainWindow>
 #include <unordered_map>
+#include <fstream>
 #include "scenariosconfigui.h"
 #include "resultsprocessui.h"
+#include "materialgeneralconfig.h"
 class MaterialConfigUI;
 class ScenarioSismicConfigUI;
 class QCheckBox;
@@ -37,6 +39,7 @@ class MainWindow : public QMainWindow
 		void removeSeismicScenario(int);
 		void toggleProperty(bool);
 		void toggleMaterialScenario(bool);
+		void applyPercentaje(double percent, int scenario_index, int property_index);
 
 	private:
 		Ui::MainWindow *ui;
@@ -48,6 +51,8 @@ class MainWindow : public QMainWindow
 		EscenarioFile main_scenario;
 		ScenariosConfigUI scenarios_config;
 		ResultsProcessUI result_process_ui;
+		MaterialGeneralConfig general_material_config;
+		void printFileParametersLine(std::ofstream& file, EscenarioSeismicCustom* seismic_es, int property_index, int scenario_index, QString complete_filename);
 };
 
 #endif // MAINWINDOW_H

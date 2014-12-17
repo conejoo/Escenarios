@@ -42,6 +42,7 @@ void ResultFile::processFileName(){
 	file_split.pop_back();
 	seismic_scenario = file_split[file_split.size()-1];
 	file_split.pop_back();
+	std::cout << "Si se pudo procesar nombre de archivo: " << filename << " Sensible: " << sensible<< std::endl;
 }
 
 void ResultFile::processFileData(){

@@ -15,7 +15,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui(new Ui::MainWindow),
 	main_scenario(),
 	scenarios_config(this),
-	result_process_ui(main_scenario, this)
+	result_process_ui(main_scenario, this),
+	general_material_config()
 {
 	ui->setupUi(this);
 	this->showMaximized();
@@ -31,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(&this->scenarios_config, SIGNAL(changedAbbrSismicScenario(int,QString)), this, SLOT(changedSismicAbbr(int,QString)));
 	connect(&this->scenarios_config, SIGNAL(removedSismicScenario(int)), this, SLOT(removeSeismicScenario(int)));
 	connect(this->ui->actionProcesar_resultados, SIGNAL(triggered()), &this->result_process_ui, SLOT(show()));
+	connect(&general_material_config, SIGNAL(percentajeApplied(double,int,int)), this, SLOT(applyPercentaje(double,int,int)));
 }
 
 MainWindow::~MainWindow()
@@ -83,23 +85,16 @@ void MainWindow::exportScenariosPromp(){
 					main_scenario.exportToFile(complete_filename.toStdString(), seismic_es->index, material_es->index, p);
 					std::cout << "Exported to: " << complete_filename.toStdString() << std::endl;
 					n++;
-					_parametros << complete_filename.right(complete_filename.length()-dir.length()-1).toStdString() << ",";
-					_parametros << seismic_es->seismic << ",";
-					_parametros << seismic_es->seismicv << ",";
-					_parametros << material.properties[p].short_name << ",";
-					for(int p2 = 0; p2 < (int)material.properties.size(); p2++){
-						int p_index = MaterialProperty::ORIGINAL_VALUE;
-						if(p == p2)
-							p_index = p;
-						_parametros << material.properties[p2].values[p_index] << ",";
-					}
-					_parametros << std::endl;
+					printFileParametersLine(_parametros, seismic_es, p, material_es->index,
+											complete_filename.right(complete_filename.length()-dir.length()-1));
 				}
 			}else{
 				filename = filename + ".sli";
 				main_scenario.exportToFile(filename.toStdString(), seismic_es->index, material_es->index, -1);
 				std::cout << "Exported to: " << filename.toStdString() << std::endl;
 				n++;
+				printFileParametersLine(_parametros, seismic_es, -1, -1,
+										filename.right(filename.length()-dir.length()-1));
 			}
 		}
 	}
@@ -111,10 +106,32 @@ void MainWindow::exportScenariosPromp(){
 	msgBox.exec();
 }
 
+void MainWindow::printFileParametersLine(std::ofstream& file, EscenarioSeismicCustom *seismic_es, int property_index, int scenario_index, QString complete_filename){
+	for(Material& material: main_scenario.materials){
+		file << complete_filename.toStdString() << ",";
+		file << seismic_es->seismic << ",";
+		file << seismic_es->seismicv << ",";
+		file << material.name << ",";
+		for(int p2 = 0; p2 < (int)material.properties.size(); p2++){
+			MaterialProperty& property = material.properties[p2];
+			if(!property.editable)
+				continue;
+			int p_index = MaterialProperty::ORIGINAL_VALUE;
+			if(property_index == p2){
+				p_index = scenario_index;
+				std::cout << "Filename: " << complete_filename.toStdString() << " prop: "<<property.name<<std::endl;
+			}
+			file << property.getValue(p_index) << ",";
+		}
+		file << std::endl;
+	}
+}
+
 void MainWindow::openScenario(std::string filename){
 	clearLayout(ui->widget_seismic->layout());
 	clearLayout(ui->widget_sensibilizar->layout());
 	clearLayout(ui->widget_materials->layout());
+	ui->scrollAreaWidgetContents->layout()->takeAt(0); //Save general material config
 	clearLayout(ui->scrollAreaWidgetContents->layout());
 	materials_ui.clear();
 	custom_seismic_schenarios_ui.clear();
@@ -124,6 +141,7 @@ void MainWindow::openScenario(std::string filename){
 	main_scenario = EscenarioFile(filename);
 	addProperties();
 	addMaterials();
+	general_material_config.clearScenarios();
 	scenarios_config.setScenarioFile(&main_scenario);
 	result_process_ui.setEscenarioFile(main_scenario);
 }
@@ -143,7 +161,7 @@ void MainWindow::clearLayout(QLayout *layout){
 }
 
 void MainWindow::addMaterialScenario(int index, QString name, QString abbr){
-	main_scenario.createCustomMaterialScenario(index, name.toStdWString(), abbr.toStdString());
+	EscenarioMaterialCustom* new_scenario = main_scenario.createCustomMaterialScenario(index, name.toStdWString(), abbr.toStdString());
 	for(MaterialConfigUI* config: materials_ui)
 		config->escenarioAdded(index, name);
 	QCheckBox* qcheckbox = new QCheckBox(name + " (" + abbr + ")", ui->groupBox_escenarios);
@@ -151,6 +169,8 @@ void MainWindow::addMaterialScenario(int index, QString name, QString abbr){
 	if(index == MaterialProperty::ORIGINAL_VALUE)
 		qcheckbox->setDisabled(true);
 	ui->widget_materials->layout()->addWidget(qcheckbox);
+	if(main_scenario.materials.size() > 0)
+		general_material_config.addScenario(new_scenario, main_scenario.materials[0]);
 	index_qcheckbox_material_scenario[index] = qcheckbox;
 	qcheckbox_material_scenario_index[qcheckbox] = index;
 	connect(qcheckbox, SIGNAL(toggled(bool)), this, SLOT(toggleMaterialScenario(bool)));
@@ -172,6 +192,7 @@ void MainWindow::changedMaterialScenarioName(int index, QString new_name){
 	QCheckBox* checkbox = index_qcheckbox_material_scenario[index];
 	checkbox->setText(new_name + " (" + QString::fromStdString(custom->abbr) + ")");
 	custom->name = new_name.toStdWString();
+	general_material_config.escenarioChangedName(index, new_name);
 }
 
 void MainWindow::changedMaterialScenarioAbbr(int index, QString abbr){
@@ -190,6 +211,7 @@ void MainWindow::removeMaterialScenario(int index){
 	ui->widget_materials->layout()->removeWidget(checkbox);
 	delete checkbox;
 	main_scenario.deleteMaterialScenario(index);
+	general_material_config.escenarioRemoved(index);
 }
 
 void MainWindow::removeSeismicScenario(int index){
@@ -212,6 +234,7 @@ void MainWindow::changedSismicAbbr(int index, QString abbr){
 }
 
 void MainWindow::addMaterials(){
+	ui->scrollAreaWidgetContents->layout()->addWidget(&general_material_config);
 	for(Material& material: main_scenario.materials){
 		MaterialConfigUI* config = new MaterialConfigUI(this,material);
 		materials_ui.push_back(config);
@@ -244,6 +267,7 @@ void MainWindow::toggleProperty(bool toggled){
 	for(MaterialConfigUI* material_ui: materials_ui){
 		material_ui->toggleProperty(index, toggled);
 	}
+	general_material_config.toggleProperty(index, toggled);
 }
 
 void MainWindow::toggleMaterialScenario(bool toggled){
@@ -253,5 +277,13 @@ void MainWindow::toggleMaterialScenario(bool toggled){
 		for(MaterialConfigUI* material_ui: materials_ui)
 			material_ui->toggleMaterial(index, toggled);
 		main_scenario.materials_escenarios[index]->enabled = toggled;
+		general_material_config.toggleMaterial(index, toggled);
+	}
+}
+
+void MainWindow::applyPercentaje(double percent, int scenario_index, int property_index){
+	std::cout << "Apply percentaje "<<percent << " " <<scenario_index<< " " << property_index<<std::endl;
+	for(MaterialConfigUI* material_ui: materials_ui){
+		material_ui->applyPercentaje(percent, scenario_index, property_index);
 	}
 }

@@ -19,6 +19,7 @@ class ScenarioMaterialsConfigUI : public QWidget
 		~ScenarioMaterialsConfigUI();
 		void setName(QString);
 		void toggleProperty(int index, bool toggled);
+		void applyPercentaje(double percentaje, int property_index);
 
 	public slots:
 		void updatePropertyValue(double new_value);
@@ -28,6 +29,7 @@ class ScenarioMaterialsConfigUI : public QWidget
 		Material& material;
 		int material_index;
 		std::unordered_map<QDoubleSpinBox*, MaterialProperty*> line_edits_material;
+		std::unordered_map<MaterialProperty*, QDoubleSpinBox*> property_line_edit;
 };
 
 #endif // SCENARIOMATERIALSCONFIGUI_H
