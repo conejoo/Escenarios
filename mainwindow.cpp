@@ -1,13 +1,16 @@
 #include "mainwindow.h"
+
 #include <QFileDialog>
 #include <iostream>
 #include <QCheckBox>
 #include <QMessageBox>
 #include <fstream>
+
+#include "utils.h"
 #include "ui_mainwindow.h"
-#include "escenariofile.h"
-#include "materialconfigui.h"
-#include "scenariosismicconfigui.h"
+#include "model/scenarios/escenariofile.h"
+#include "gui/scenarios/materialconfigui.h"
+#include "gui/scenarios/scenariosismicconfigui.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -59,9 +62,20 @@ void MainWindow::exportScenariosPromp(){
 	if(dir.size() == 0 || main_scenario.materials.size() == 0)
 		return; // cancel
 	int n = 0;
-	std::ofstream _parametros;
-	std::string _par_filename = dir.toStdString() + "/" + main_scenario.filename + "_parametros.sli";
+	std::wofstream _parametros;
+	std::string _par_filename = dir.toStdString() + "/" + main_scenario.filename + "_parametros.csv";
 	_parametros.open(_par_filename.c_str());
+	_parametros << "Escenario" << ",";
+	_parametros << "CCS Horizontal" << ",";
+	_parametros << "CCS Vertical" << ",";
+	_parametros << "Material" << ",";
+	{
+		std::vector<MaterialProperty>& props = main_scenario.materials[0].properties;
+		for(MaterialProperty& prop: props)
+			if(prop.editable)
+				_parametros << prop.name << ",";
+	}
+	_parametros << std::endl;
 	for (const auto& ite: main_scenario.materials_escenarios) {
 		EscenarioMaterialCustom* material_es = ite.second;
 		if(!material_es->enabled)
@@ -106,12 +120,12 @@ void MainWindow::exportScenariosPromp(){
 	msgBox.exec();
 }
 
-void MainWindow::printFileParametersLine(std::ofstream& file, EscenarioSeismicCustom *seismic_es, int property_index, int scenario_index, QString complete_filename){
+void MainWindow::printFileParametersLine(std::wofstream& file, EscenarioSeismicCustom *seismic_es, int property_index, int scenario_index, QString complete_filename){
 	for(Material& material: main_scenario.materials){
-		file << complete_filename.toStdString() << ",";
+		file << complete_filename.toStdWString() << ",";
 		file << seismic_es->seismic << ",";
 		file << seismic_es->seismicv << ",";
-		file << material.name << ",";
+		file << Utils::toWString(material.name) << ",";
 		for(int p2 = 0; p2 < (int)material.properties.size(); p2++){
 			MaterialProperty& property = material.properties[p2];
 			if(!property.editable)
@@ -119,7 +133,6 @@ void MainWindow::printFileParametersLine(std::ofstream& file, EscenarioSeismicCu
 			int p_index = MaterialProperty::ORIGINAL_VALUE;
 			if(property_index == p2){
 				p_index = scenario_index;
-				std::cout << "Filename: " << complete_filename.toStdString() << " prop: "<<property.name<<std::endl;
 			}
 			file << property.getValue(p_index) << ",";
 		}
@@ -248,7 +261,7 @@ void MainWindow::addProperties(){
 	for(MaterialProperty &property: main_scenario.materials[0].properties){
 		if(!property.editable)
 			continue;
-		QCheckBox* qcheckbox = new QCheckBox(QString::fromStdString(property.name), ui->widget_sensibilizar);
+		QCheckBox* qcheckbox = new QCheckBox(QString::fromStdWString(property.name), ui->widget_sensibilizar);
 		qcheckbox->setChecked(true);
 		ui->widget_sensibilizar->layout()->addWidget(qcheckbox);
 		qcheckbox_property_index[qcheckbox] = &property;

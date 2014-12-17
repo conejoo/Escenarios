@@ -1,13 +1,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "escenariofile.h"
 #include <QMainWindow>
 #include <unordered_map>
 #include <fstream>
-#include "scenariosconfigui.h"
-#include "resultsprocessui.h"
-#include "materialgeneralconfig.h"
+#include "model/scenarios/escenariofile.h"
+#include "gui/scenarios/scenariosconfigui.h"
+#include "gui/scenarios/materialgeneralconfig.h"
+#include "gui/results/resultsprocessui.h"
+
 class MaterialConfigUI;
 class ScenarioSismicConfigUI;
 class QCheckBox;
@@ -52,7 +53,7 @@ class MainWindow : public QMainWindow
 		ScenariosConfigUI scenarios_config;
 		ResultsProcessUI result_process_ui;
 		MaterialGeneralConfig general_material_config;
-		void printFileParametersLine(std::ofstream& file, EscenarioSeismicCustom* seismic_es, int property_index, int scenario_index, QString complete_filename);
+		void printFileParametersLine(std::wofstream& file, EscenarioSeismicCustom* seismic_es, int property_index, int scenario_index, QString complete_filename);
 };
 
 #endif // MAINWINDOW_H

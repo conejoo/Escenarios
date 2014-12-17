@@ -15,48 +15,48 @@ TEMPLATE = app
 QMAKE_CXXFLAGS += -std=c++0x -U__STRICT_ANSI__
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    escenariofile.cpp \
+	mainwindow.cpp \
     utils.cpp \
-    material.cpp \
-    materialproperty.cpp \
-    scenariomaterialsconfigui.cpp \
-    materialconfigui.cpp \
-    scenariosconfigui.cpp \
-    scenariosismicconfigui.cpp \
-    resultsprocessui.cpp \
-    resultfile.cpp \
-    escenarioseismiccustom.cpp \
-    escenariomaterialcustom.cpp \
-    resultmethod.cpp \
-    customfiledialognewlayout.cpp \
-    materialescenariosgeneralconfig.cpp \
-    materialgeneralconfig.cpp
+    gui/results/customfiledialognewlayout.cpp \
+    gui/results/resultsprocessui.cpp \
+    gui/scenarios/materialconfigui.cpp \
+    gui/scenarios/materialescenariosgeneralconfig.cpp \
+    gui/scenarios/materialgeneralconfig.cpp \
+    gui/scenarios/scenariomaterialsconfigui.cpp \
+    gui/scenarios/scenariosconfigui.cpp \
+    gui/scenarios/scenariosismicconfigui.cpp \
+    model/results/resultfile.cpp \
+    model/results/resultmethod.cpp \
+    model/scenarios/escenariofile.cpp \
+    model/scenarios/escenariomaterialcustom.cpp \
+    model/scenarios/escenarioseismiccustom.cpp \
+    model/scenarios/material.cpp \
+    model/scenarios/materialproperty.cpp
 
 HEADERS  += mainwindow.h \
-    escenariofile.h \
-    utils.h \
-    material.h \
-    materialproperty.h \
-    scenariomaterialsconfigui.h \
-    materialconfigui.h \
-    scenariosconfigui.h \
-    scenariosismicconfigui.h \
-    resultsprocessui.h \
-    resultfile.h \
-    escenarioseismiccustom.h \
-    escenariomaterialcustom.h \
-    resultmethod.h \
-    customfiledialognewlayout.h \
-    materialescenariosgeneralconfig.h \
-    materialgeneralconfig.h
+    gui/results/customfiledialognewlayout.h \
+    gui/results/resultsprocessui.h \
+    gui/scenarios/materialconfigui.h \
+    gui/scenarios/materialescenariosgeneralconfig.h \
+    gui/scenarios/materialgeneralconfig.h \
+    gui/scenarios/scenariomaterialsconfigui.h \
+    gui/scenarios/scenariosconfigui.h \
+    gui/scenarios/scenariosismicconfigui.h \
+    model/results/resultfile.h \
+    model/results/resultmethod.h \
+    model/scenarios/escenariofile.h \
+    model/scenarios/escenariomaterialcustom.h \
+    model/scenarios/escenarioseismiccustom.h \
+    model/scenarios/material.h \
+    model/scenarios/materialproperty.h \
+    utils.h
 
 FORMS    += mainwindow.ui \
-    scenariomaterialsconfigui.ui \
-    materialconfigui.ui \
-    scenariosconfigui.ui \
-    scenariosismicconfigui.ui \
-    resultsprocessui.ui \
-    customfiledialognewlayout.ui \
-    materialescenariosgeneralconfig.ui \
-    materialgeneralconfig.ui
+    gui/results/customfiledialognewlayout.ui \
+    gui/results/resultsprocessui.ui \
+    gui/scenarios/materialconfigui.ui \
+    gui/scenarios/materialescenariosgeneralconfig.ui \
+    gui/scenarios/materialgeneralconfig.ui \
+    gui/scenarios/scenariomaterialsconfigui.ui \
+    gui/scenarios/scenariosconfigui.ui \
+    gui/scenarios/scenariosismicconfigui.ui

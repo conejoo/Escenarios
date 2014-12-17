@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <vector>
 #include <sstream>
+#include <string>
+#include <QString>
 
 class Utils
 {
@@ -65,6 +67,10 @@ class Utils
 		static std::string removeFileExtension(std::string& filename){
 			std::string filename_without_ext = filename.substr(0, filename.find_last_of("."));
 			return filename_without_ext;
+		}
+
+		static std::wstring toWString(std::string s){
+			return QString::fromStdString(s).toStdWString();
 		}
 };
 
