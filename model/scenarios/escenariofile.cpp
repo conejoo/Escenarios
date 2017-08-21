@@ -1,8 +1,11 @@
 #include "escenariofile.h"
 #include "utils.h"
+
+#include <stdexcept>
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <cctype>
 
 EscenarioFile::EscenarioFile(){}
 
@@ -13,12 +16,13 @@ EscenarioFile::EscenarioFile(std::string filename):
 	for(std::string line; std::getline(infile, line);)
 		lines.push_back(line);
 	find_file_sections();
-	process_materials();
 	process_seismic();
+	process_strength_functions();
+	process_materials();
 	std::cout << "sesmic_position " << sesmic_position << std::endl;
 	std::cout << "sesmicv_position " << sesmicv_position << std::endl;
-	std::cout << "material_types_position " << material_types_position << std::endl;
-	std::cout << "material_types_end_position " << material_types_end << std::endl;
+	std::cout << "Material Types position (" << material_types_position << ", " << material_types_end << ")" << std::endl;
+	std::cout << "Strength Functions position (" << strength_functions_start << ", " << strength_functions_end << ")" << std::endl;
 	std::cout << "Materiales: "<< std::endl;
 	for(Material m: materials)
 		std::cout << m.toString() << std::endl;
@@ -39,30 +43,61 @@ int EscenarioFile::find_empty_line(int pos){
 	return -1;
 }
 
-int EscenarioFile::find_line_starting_in(int pos, const char* chars){
+int EscenarioFile::find_line_starting_in(int pos, const char* chars, bool throw_exception){
 	std::string needle(chars);
 	for(unsigned int p = pos; p < lines.size(); p++)
 		if(Utils::begins_with(lines[p], needle))
 			return p;
+	if (throw_exception)
+		throw std::runtime_error(std::string("File section not found: ") + std::string(chars));
 	return -1;
 }
 
 void EscenarioFile::find_file_sections()
 {
-	sesmic_position = find_line_starting_in(0, "  seismic:");
-	sesmicv_position = find_line_starting_in(sesmic_position, "  seismicv:");
-	material_types_position = find_line_starting_in(sesmic_position, "material types:");
+	sesmic_position = find_line_starting_in(0, "  seismic:", true);
+	sesmicv_position = find_line_starting_in(sesmic_position, "  seismicv:", true);
+	material_types_position = find_line_starting_in(sesmic_position, "material types:", true);
 	material_types_end = find_empty_line(material_types_position);
-	material_names_start= find_line_starting_in(material_types_end, "material properties:");
+	strength_functions_start = find_line_starting_in(material_types_end, "strength functions:", true);
+	strength_functions_end = find_empty_line(strength_functions_start);
+	material_names_start = find_line_starting_in(strength_functions_end, "material properties:", true);
 }
 
-void EscenarioFile::process_materials(){
-	for(int start = material_types_position + 1; start < material_types_end; start++){
+void EscenarioFile::process_materials() {
+	for (int start = material_types_position + 1; start < material_types_end; start++){
 		std::string line = lines[start];
 		if(line.length() > 4){
 			std::string description = lines[start-material_types_position + material_names_start];
 			materials.push_back(Material(line, description));
 		}
+	}
+	for (Material &m: materials) {
+		if (strength_functions.find(m.strength_fn) != strength_functions.end()) {
+			strength_functions[m.strength_fn]->in_use = true;
+			std::cout << "Function " << m.strength_fn << " USADA"<< std::endl;
+		}
+	}
+}
+
+void EscenarioFile::process_strength_functions() {
+	std::vector<std::string> current_fn_lines;
+	for (int i = strength_functions_start + 1; i < strength_functions_end; i++) {
+		if (std::isdigit(lines[i][0])) {
+			// new fn lines
+			if (current_fn_lines.size() > 0) {
+				// Create strength fn
+				StrengthFunction* fn = new StrengthFunction(current_fn_lines);
+				strength_functions[fn->name] = fn;
+			}
+			current_fn_lines.clear();
+		}
+		current_fn_lines.push_back(lines[i]);
+	}
+	if (current_fn_lines.size() > 0) {
+		// Create strength fn
+		StrengthFunction* fn = new StrengthFunction(current_fn_lines);
+		strength_functions[fn->name] = fn;
 	}
 }
 

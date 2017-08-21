@@ -43,7 +43,7 @@
        <number>0</number>
       </property>
       <item>
-       <spacer name="verticalSpacer">
+       <spacer name="verticalSpacer_2">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
@@ -108,7 +108,7 @@
        </widget>
       </item>
       <item>
-       <spacer name="verticalSpacer_2">
+       <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
@@ -121,13 +121,6 @@
        </spacer>
       </item>
      </layout>
-     <zorder>widget_dialog</zorder>
-     <zorder>pushButton_add_all</zorder>
-     <zorder>pushButton_add_one</zorder>
-     <zorder>pushButton_remove_one</zorder>
-     <zorder>pushButton_remove_all</zorder>
-     <zorder>verticalSpacer</zorder>
-     <zorder>verticalSpacer_2</zorder>
     </widget>
    </item>
    <item>

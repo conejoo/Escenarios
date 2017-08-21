@@ -2,10 +2,12 @@
 #define SCENARIOMATERIALSCONFIGUI_H
 
 #include <QWidget>
-#include <QDoubleSpinBox>
 #include <vector>
 
 #include "model/scenarios/material.h"
+
+class QDoubleSpinBox;
+class QComboBox;
 
 namespace Ui {
 class ScenarioMaterialsConfigUI;
@@ -21,6 +23,7 @@ class ScenarioMaterialsConfigUI : public QWidget
 		void setName(QString);
 		void toggleProperty(int index, bool toggled);
 		void applyPercentaje(double percentaje, int property_index);
+		void setupStrengthsFunctionsCombobox(QStringList& list);
 
 	public slots:
 		void updatePropertyValue(double new_value);
@@ -31,6 +34,7 @@ class ScenarioMaterialsConfigUI : public QWidget
 		int material_index;
 		std::unordered_map<QDoubleSpinBox*, MaterialProperty*> line_edits_material;
 		std::unordered_map<MaterialProperty*, QDoubleSpinBox*> property_line_edit;
+		QComboBox *str_functions;
 };
 
 #endif // SCENARIOMATERIALSCONFIGUI_H

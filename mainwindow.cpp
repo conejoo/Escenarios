@@ -1,16 +1,19 @@
 #include "mainwindow.h"
 
-#include <QFileDialog>
 #include <iostream>
+#include <fstream>
+#include <exception>
+
+#include <QFileDialog>
 #include <QCheckBox>
 #include <QMessageBox>
-#include <fstream>
 
 #include "utils.h"
 #include "ui_mainwindow.h"
 #include "model/scenarios/escenariofile.h"
 #include "gui/scenarios/materialconfigui.h"
 #include "gui/scenarios/scenariosismicconfigui.h"
+#include "gui/scenarios/strengthfunctionconfig.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -146,17 +149,34 @@ void MainWindow::openScenario(std::string filename){
 	clearLayout(ui->widget_materials->layout());
 	ui->scrollAreaWidgetContents->layout()->takeAt(0); //Save general material config
 	clearLayout(ui->scrollAreaWidgetContents->layout());
+	clearLayout(ui->scrollAreaWidgetContents_2->layout()); // Strength functions
 	materials_ui.clear();
 	custom_seismic_schenarios_ui.clear();
 	qcheckbox_property_index.clear();
 	qcheckbox_material_scenario_index.clear();
 	index_qcheckbox_material_scenario.clear();
-	main_scenario = EscenarioFile(filename);
-	addProperties();
-	addMaterials();
-	general_material_config.clearScenarios();
-	scenarios_config.setScenarioFile(&main_scenario);
-	result_process_ui.setEscenarioFile(main_scenario);
+	try {
+		main_scenario = EscenarioFile(filename);
+		addProperties();
+		addMaterials();
+		addStrengthFunctions();
+		general_material_config.clearScenarios();
+		scenarios_config.setScenarioFile(&main_scenario);
+		result_process_ui.setEscenarioFile(main_scenario);
+	}
+	catch (std::exception& e) {
+		std::cout << "Standard exception: " << e.what() << std::endl;
+		QMessageBox messageBox;
+		messageBox.critical(
+			0,
+			"Error trying to load SLI file",
+			QString::fromStdString(
+				std::string("There is a problem with the format of the file.\n") +
+				std::string(e.what())
+			)
+		);
+		messageBox.setFixedSize(500,200);
+	}
 }
 
 void MainWindow::clearLayout(QLayout *layout){
@@ -247,11 +267,21 @@ void MainWindow::changedSismicAbbr(int index, QString abbr){
 }
 
 void MainWindow::addMaterials(){
+	QStringList str_functions_list;
+	for ( auto it: main_scenario.strength_functions )
+		str_functions_list.append(QString::fromStdString(it.first));
 	ui->scrollAreaWidgetContents->layout()->addWidget(&general_material_config);
 	for(Material& material: main_scenario.materials){
-		MaterialConfigUI* config = new MaterialConfigUI(this,material);
+		MaterialConfigUI* config = new MaterialConfigUI(this,material, str_functions_list);
 		materials_ui.push_back(config);
 		ui->scrollAreaWidgetContents->layout()->addWidget(config);
+	}
+}
+
+void MainWindow::addStrengthFunctions() {
+	for(auto it: main_scenario.strength_functions) {
+		StrengthFunctionConfig* config = new StrengthFunctionConfig(this, it.second);
+		ui->scrollAreaWidgetContents_2->layout()->addWidget(config);
 	}
 }
 

@@ -2,9 +2,12 @@
 #include "ui_scenariomaterialsconfigui.h"
 #include "model/scenarios/materialproperty.h"
 #include "gui/scenarios/materialconfigui.h"
+#include "model/scenarios/strengthfunction.h"
 
 #include <iostream>
 #include <QLabel>
+#include <QComboBox>
+#include <QDoubleSpinBox>
 
 ScenarioMaterialsConfigUI::ScenarioMaterialsConfigUI(QWidget *parent, int index, Material& material) :
 	QWidget(parent),
@@ -12,6 +15,7 @@ ScenarioMaterialsConfigUI::ScenarioMaterialsConfigUI(QWidget *parent, int index,
 	material(material)
 {
 	ui->setupUi(this);
+	this->str_functions = 0;
 	this->material_index = index;
 	//this->read_only = read_only;
 	QFormLayout * grid_layout = qobject_cast<QFormLayout *>(ui->groupBox->layout());
@@ -36,6 +40,10 @@ ScenarioMaterialsConfigUI::ScenarioMaterialsConfigUI(QWidget *parent, int index,
 		grid_layout->addRow(QString::fromStdWString(property.name), line_edit);
 		connect(line_edit, SIGNAL(valueChanged(double)), this, SLOT(updatePropertyValue(double)));
 	}
+	if (material.type == 6) {
+		str_functions = new QComboBox();
+		grid_layout->addRow(QString("Strenght Function"), str_functions);
+	}
 }
 
 ScenarioMaterialsConfigUI::~ScenarioMaterialsConfigUI()
@@ -43,6 +51,15 @@ ScenarioMaterialsConfigUI::~ScenarioMaterialsConfigUI()
 	delete ui;
 	for(auto& it: line_edits_material)
 		delete it.first;
+}
+
+void ScenarioMaterialsConfigUI::setupStrengthsFunctionsCombobox(QStringList &list) {
+	if (str_functions)
+		for (QString fn: list)
+			str_functions->addItem(fn);
+	int index = str_functions->findText(QString::fromStdString(material.strength_fn));
+	if( index != -1 )
+		str_functions->setCurrentIndex(index);
 }
 
 void ScenarioMaterialsConfigUI::toggleProperty(int index, bool toggled){

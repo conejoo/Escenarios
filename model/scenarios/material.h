@@ -3,7 +3,10 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "materialproperty.h"
+
+class StrengthFunction;
 
 class Material
 {
@@ -13,7 +16,9 @@ class Material
 		std::string toString(int n, int property_index); // print using n-prop
 		std::string id;
 		std::string name;
+		int type;
 		std::vector<MaterialProperty> properties;
+		std::string strength_fn;
 };
 
 #endif // MATERIAL_H

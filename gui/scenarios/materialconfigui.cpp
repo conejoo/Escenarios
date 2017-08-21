@@ -3,13 +3,14 @@
 #include <QLabel>
 #include <iostream>
 
-MaterialConfigUI::MaterialConfigUI(QWidget *parent, Material& material) :
+MaterialConfigUI::MaterialConfigUI(QWidget *parent, Material& material, QStringList str_function_names) :
 	QWidget(parent),
 	ui(new Ui::MaterialConfigUI),
 	material(material)
 {
 	ui->setupUi(this);
 	ui->material_box->setTitle(QString::fromStdString(material.name));
+	this->str_functions_list = str_function_names;
 }
 
 MaterialConfigUI::~MaterialConfigUI()
@@ -27,6 +28,8 @@ void MaterialConfigUI::escenarioRemoved(int index){
 void MaterialConfigUI::escenarioAdded(int index, QString name){
 	ScenarioMaterialsConfigUI* config = new ScenarioMaterialsConfigUI(ui->material_box, index, material);
 	config->setName(name);
+	if (material.type == 6)
+		config->setupStrengthsFunctionsCombobox(str_functions_list);
 	material_scenarios[index] = config;
 	ui->material_box->layout()->addWidget(config);
 }

@@ -31,6 +31,7 @@ class MainWindow : public QMainWindow
 		void addMaterialScenario(int, QString, QString);
 		void addProperties();
 		void addMaterials();
+		void addStrengthFunctions();
 		void addSismicScenario(int, QString, QString);
 		void changedMaterialScenarioName(int index, QString new_name);
 		void changedMaterialScenarioAbbr(int index, QString abbr);

@@ -12,19 +12,19 @@ class Utils
 	public:
 		Utils();
 
-		static inline std::string &ltrim(std::string &s) {
+		static inline std::string ltrim(std::string s) {
 			s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
 			return s;
 		}
 
 		// trim from end
-		static inline std::string &rtrim(std::string &s) {
+		static inline std::string rtrim(std::string s) {
 			s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
 			return s;
 		}
 
 		// trim from both ends
-		static inline std::string &trim(std::string &s) {
+		static inline std::string trim(std::string s) {
 			return ltrim(rtrim(s));
 		}
 		template<class TContainer>
@@ -71,6 +71,21 @@ class Utils
 
 		static std::wstring toWString(std::string s){
 			return QString::fromStdString(s).toStdWString();
+		}
+
+		static std::vector<int> getIntegers(const std::string &str) {
+			std::string all_numbers(str.begin(), str.end());
+			all_numbers.erase(std::remove_if(
+						all_numbers.begin(),
+						all_numbers.end(),
+						[](char c){return c != '-' && c != ' ' && !std::isdigit(c);}
+				), all_numbers.end());
+			std::stringstream ss(all_numbers);
+			std::vector<int> numbers;
+			for(int i = 0; ss >> i; ) {
+				numbers.push_back(i);
+			}
+			return numbers;
 		}
 };
 

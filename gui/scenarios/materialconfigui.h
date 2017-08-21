@@ -16,7 +16,7 @@ class MaterialConfigUI : public QWidget
 		Q_OBJECT
 
 	public:
-		explicit MaterialConfigUI(QWidget *parent, Material& material);
+		explicit MaterialConfigUI(QWidget *parent, Material& material, QStringList str_function_names);
 		~MaterialConfigUI();
 		void escenarioRemoved(int index);
 		void escenarioAdded(int index, QString name);
@@ -29,6 +29,7 @@ class MaterialConfigUI : public QWidget
 		Ui::MaterialConfigUI *ui;
 		Material& material;
 		std::unordered_map<int, ScenarioMaterialsConfigUI*> material_scenarios;
+		QStringList str_functions_list;
 };
 
 #endif // MATERIALCONFIGUI_H

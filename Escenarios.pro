@@ -4,13 +4,12 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Escenarios
 TEMPLATE = app
-
 
 QMAKE_CXXFLAGS += -std=c++0x -U__STRICT_ANSI__
 
@@ -31,7 +30,9 @@ SOURCES += main.cpp\
     model/scenarios/escenariomaterialcustom.cpp \
     model/scenarios/escenarioseismiccustom.cpp \
     model/scenarios/material.cpp \
-    model/scenarios/materialproperty.cpp
+    model/scenarios/materialproperty.cpp \
+    model/scenarios/strengthfunction.cpp \
+    gui/scenarios/strengthfunctionconfig.cpp
 
 HEADERS  += mainwindow.h \
     gui/results/customfiledialognewlayout.h \
@@ -49,7 +50,9 @@ HEADERS  += mainwindow.h \
     model/scenarios/escenarioseismiccustom.h \
     model/scenarios/material.h \
     model/scenarios/materialproperty.h \
-    utils.h
+    utils.h \
+    model/scenarios/strengthfunction.h \
+    gui/scenarios/strengthfunctionconfig.h
 
 FORMS    += mainwindow.ui \
     gui/results/customfiledialognewlayout.ui \
@@ -59,4 +62,5 @@ FORMS    += mainwindow.ui \
     gui/scenarios/materialgeneralconfig.ui \
     gui/scenarios/scenariomaterialsconfigui.ui \
     gui/scenarios/scenariosconfigui.ui \
-    gui/scenarios/scenariosismicconfigui.ui
+    gui/scenarios/scenariosismicconfigui.ui \
+    gui/scenarios/strengthfunctionconfig.ui
