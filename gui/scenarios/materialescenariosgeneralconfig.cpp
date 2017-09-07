@@ -36,6 +36,7 @@ MaterialEscenariosGeneralConfig::MaterialEscenariosGeneralConfig(QWidget *parent
 		grid_layout->addWidget(new QLabel(QString::fromStdWString(property.name)), row, 0);
 		grid_layout->addWidget(line_edit,row, 1);
 		grid_layout->addWidget(pbutton,row, 2);
+		property_name_index[QString::fromStdString(property.short_name)] = row;
 		buttons_map[pbutton] = std::pair<int, QDoubleSpinBox*>(property_index, line_edit);
 		connect(pbutton, SIGNAL(clicked()), this, SLOT(applyPercentaje()));
 		row++;
@@ -51,11 +52,14 @@ void MaterialEscenariosGeneralConfig::setName(QString new_name){
 	ui->groupBox->setTitle(new_name);
 }
 
-void MaterialEscenariosGeneralConfig::toggleProperty(int index, bool toggled){
-	QGridLayout * grid_layout = qobject_cast<QGridLayout *>(ui->groupBox->layout());
-	grid_layout->itemAtPosition(index, 0)->widget()->setEnabled(toggled);
-	grid_layout->itemAtPosition(index, 1)->widget()->setEnabled(toggled);
-	grid_layout->itemAtPosition(index, 2)->widget()->setEnabled(toggled);
+void MaterialEscenariosGeneralConfig::toggleProperty(QString name, bool toggled){
+	if (property_name_index.find(name) != property_name_index.end()) {
+		int index = property_name_index[name];
+		QGridLayout * grid_layout = qobject_cast<QGridLayout *>(ui->groupBox->layout());
+		grid_layout->itemAtPosition(index, 0)->widget()->setEnabled(toggled);
+		grid_layout->itemAtPosition(index, 1)->widget()->setEnabled(toggled);
+		grid_layout->itemAtPosition(index, 2)->widget()->setEnabled(toggled);
+	}
 }
 
 void MaterialEscenariosGeneralConfig::applyPercentaje(){

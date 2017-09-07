@@ -38,11 +38,16 @@ ScenarioMaterialsConfigUI::ScenarioMaterialsConfigUI(QWidget *parent, int index,
 		if(material_index == MaterialProperty::ORIGINAL_VALUE)
 			ui->groupBox->setStyleSheet("QGroupBox, QLabel { color : blue; }");
 		grid_layout->addRow(QString::fromStdWString(property.name), line_edit);
+		property_name_index[QString::fromStdString(property.short_name)] = grid_layout->rowCount() - 1;
 		connect(line_edit, SIGNAL(valueChanged(double)), this, SLOT(updatePropertyValue(double)));
 	}
 	if (material.type == 6) {
-		str_functions = new QComboBox();
-		grid_layout->addRow(QString("Strenght Function"), str_functions);
+		//str_functions = new QComboBox();
+		grid_layout->addRow(
+			QString("Strength Function"),
+			new QLabel(QString::fromStdString(material.strength_fn))
+		);
+
 	}
 }
 
@@ -53,19 +58,23 @@ ScenarioMaterialsConfigUI::~ScenarioMaterialsConfigUI()
 		delete it.first;
 }
 
-void ScenarioMaterialsConfigUI::setupStrengthsFunctionsCombobox(QStringList &list) {
-	if (str_functions)
-		for (QString fn: list)
-			str_functions->addItem(fn);
-	int index = str_functions->findText(QString::fromStdString(material.strength_fn));
-	if( index != -1 )
-		str_functions->setCurrentIndex(index);
-}
+//void ScenarioMaterialsConfigUI::setupStrengthsFunctionsCombobox(QStringList &list) {
+//	if (str_functions)
+//		for (QString fn: list)
+//			str_functions->addItem(fn);
+//	int index = str_functions->findText(QString::fromStdString(material.strength_fn));
+//	if( index != -1 )
+//		str_functions->setCurrentIndex(index);
+//}
 
-void ScenarioMaterialsConfigUI::toggleProperty(int index, bool toggled){
-	QFormLayout * grid_layout = qobject_cast<QFormLayout *>(ui->groupBox->layout());
-	grid_layout->itemAt(index, QFormLayout::FieldRole)->widget()->setEnabled(toggled);
-	grid_layout->itemAt(index, QFormLayout::LabelRole)->widget()->setEnabled(toggled);
+void ScenarioMaterialsConfigUI::toggleProperty(QString name, bool toggled){
+	if (property_name_index.find(name) != property_name_index.end()) {
+		int index = property_name_index[name];
+		QFormLayout * grid_layout = qobject_cast<QFormLayout *>(ui->groupBox->layout());
+		grid_layout->itemAt(index, QFormLayout::FieldRole)->widget()->setEnabled(toggled);
+		grid_layout->itemAt(index, QFormLayout::LabelRole)->widget()->setEnabled(toggled);
+
+	}
 }
 
 void ScenarioMaterialsConfigUI::updatePropertyValue(double new_value){

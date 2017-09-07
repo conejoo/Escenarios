@@ -21,7 +21,7 @@ class MaterialEscenariosGeneralConfig : public QWidget
 		explicit MaterialEscenariosGeneralConfig(QWidget *parent, Material &material, int index);
 		~MaterialEscenariosGeneralConfig();
 		void setName(QString);
-		void toggleProperty(int index, bool toggled);
+		void toggleProperty(QString name, bool toggled);
 
 	public slots:
 		void applyPercentaje();
@@ -34,6 +34,7 @@ class MaterialEscenariosGeneralConfig : public QWidget
 		int row;
 		int scenario_index;
 		std::unordered_map<QPushButton*, std::pair<int, QDoubleSpinBox*> > buttons_map;
+		QHash<QString, int> property_name_index;
 };
 
 #endif // MATERIALESCENARIOSGENERALCONFIG_H

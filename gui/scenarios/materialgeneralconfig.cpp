@@ -46,12 +46,13 @@ void MaterialGeneralConfig::escenarioChangedName(int index, QString newname){
 	config->setName(newname);
 }
 
-void MaterialGeneralConfig::toggleProperty(int index, bool toggled){
+void MaterialGeneralConfig::toggleProperty(QString name, bool toggled){
 	for(auto it: configs){
 		MaterialEscenariosGeneralConfig* config = it.second;
-		config->toggleProperty(index, toggled);
+		config->toggleProperty(name, toggled);
 	}
 }
+
 void MaterialGeneralConfig::toggleMaterial(int index, bool show){
 	MaterialEscenariosGeneralConfig* config = configs[index];
 	if(config)

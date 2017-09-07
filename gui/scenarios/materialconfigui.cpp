@@ -3,14 +3,13 @@
 #include <QLabel>
 #include <iostream>
 
-MaterialConfigUI::MaterialConfigUI(QWidget *parent, Material& material, QStringList str_function_names) :
+MaterialConfigUI::MaterialConfigUI(QWidget *parent, Material& material) :
 	QWidget(parent),
 	ui(new Ui::MaterialConfigUI),
 	material(material)
 {
 	ui->setupUi(this);
 	ui->material_box->setTitle(QString::fromStdString(material.name));
-	this->str_functions_list = str_function_names;
 }
 
 MaterialConfigUI::~MaterialConfigUI()
@@ -28,8 +27,8 @@ void MaterialConfigUI::escenarioRemoved(int index){
 void MaterialConfigUI::escenarioAdded(int index, QString name){
 	ScenarioMaterialsConfigUI* config = new ScenarioMaterialsConfigUI(ui->material_box, index, material);
 	config->setName(name);
-	if (material.type == 6)
-		config->setupStrengthsFunctionsCombobox(str_functions_list);
+//	if (material.type == 6)
+//		config->setupStrengthsFunctionsCombobox(str_functions_list);
 	material_scenarios[index] = config;
 	ui->material_box->layout()->addWidget(config);
 }
@@ -39,13 +38,14 @@ void MaterialConfigUI::escenarioChangedName(int index, QString newname){
 	config->setName(newname);
 }
 
-void MaterialConfigUI::toggleProperty(int index, bool toggled){
+void MaterialConfigUI::toggleProperty(QString name, bool toggled){
 	for(auto it: material_scenarios){
 		ScenarioMaterialsConfigUI* config = it.second;
-		config->toggleProperty(index, toggled);
+		config->toggleProperty(name, toggled);
 	}
 }
-void MaterialConfigUI::toggleMaterial(int index, bool show){
+
+void MaterialConfigUI::toggleScenario(int index, bool show){
 	ScenarioMaterialsConfigUI* config = material_scenarios[index];
 	if(config)
 		config->setVisible(show);

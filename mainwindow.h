@@ -10,6 +10,7 @@
 #include "gui/results/resultsprocessui.h"
 
 class MaterialConfigUI;
+class StrengthFunctionConfig;
 class ScenarioSismicConfigUI;
 class QCheckBox;
 namespace Ui {
@@ -45,6 +46,7 @@ class MainWindow : public QMainWindow
 
 	private:
 		Ui::MainWindow *ui;
+		std::vector<StrengthFunctionConfig*> strength_functions_ui;
 		std::vector<MaterialConfigUI*> materials_ui;
 		std::unordered_map<int, ScenarioSismicConfigUI*> custom_seismic_schenarios_ui;
 		std::unordered_map<QCheckBox*, MaterialProperty*> qcheckbox_property_index;

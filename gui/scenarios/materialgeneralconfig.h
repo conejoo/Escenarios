@@ -24,7 +24,7 @@ class MaterialGeneralConfig : public QWidget
 		void escenarioRemoved(int index);
 		void escenarioChangedName(int index, QString newname);
 		void toggleMaterial(int index, bool show);
-		void toggleProperty(int index, bool toggled);
+		void toggleProperty(QString name, bool toggled);
 
 	signals:
 		void percentajeApplied(double percent, int scenario_index, int property_index);

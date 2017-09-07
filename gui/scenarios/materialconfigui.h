@@ -16,20 +16,19 @@ class MaterialConfigUI : public QWidget
 		Q_OBJECT
 
 	public:
-		explicit MaterialConfigUI(QWidget *parent, Material& material, QStringList str_function_names);
+		explicit MaterialConfigUI(QWidget *parent, Material& material);
 		~MaterialConfigUI();
 		void escenarioRemoved(int index);
 		void escenarioAdded(int index, QString name);
 		void escenarioChangedName(int index, QString newname);
-		void toggleMaterial(int index, bool show);
-		void toggleProperty(int index, bool toggled);
+		void toggleScenario(int index, bool show);
+		void toggleProperty(QString name, bool toggled);
 		void applyPercentaje(double percentaje, int scenario_index, int property_index);
 
 	private:
 		Ui::MaterialConfigUI *ui;
 		Material& material;
 		std::unordered_map<int, ScenarioMaterialsConfigUI*> material_scenarios;
-		QStringList str_functions_list;
 };
 
 #endif // MATERIALCONFIGUI_H

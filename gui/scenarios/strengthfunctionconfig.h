@@ -1,56 +1,36 @@
 #ifndef STRENGTHFUNCTIONCONFIG_H
 #define STRENGTHFUNCTIONCONFIG_H
 
-#include <QWidget>
 #include <unordered_map>
+#include <QWidget>
+
+
+class StrengthFunction;
 
 namespace Ui {
 class StrengthFunctionConfig;
 }
-class StrengthFunction;
-class QSpinBox;
-class QLabel;
-namespace QtCharts {
-class QPieSeries;
-class QChartView;
-}
+
+class ScenarioStrengthFunctionConfig;
+
 class StrengthFunctionConfig : public QWidget
 {
 		Q_OBJECT
 
 	public:
-		explicit StrengthFunctionConfig(QWidget *parent = 0, StrengthFunction* function = 0);
+		explicit StrengthFunctionConfig(QWidget *parent, StrengthFunction* strength_function);
 		~StrengthFunctionConfig();
-
-	public slots:
-		void changedAngles();
-		void applyAngleShift();
+		void escenarioRemoved(int index);
+		void escenarioAdded(int index, QString name);
+		void escenarioChangedName(int index, QString newname);
+		void applyPercentaje(double percentaje, int scenario_index, int property_index);
+		void toggleScenario(int index, bool show);
+		void toggleProperty(QString name, bool toggled);
 
 	private:
 		Ui::StrengthFunctionConfig *ui;
-		StrengthFunction* function;
-		QSpinBox* getAngleSpinBox(int row);
-		std::vector<QSpinBox*> createSpinBoxes(std::vector<int> &values_row);
-		QWidget* createColorWidget(std::vector<int> &values_row);
-		void setupPieChart(std::vector<std::vector<int> > &values_row);
-		void moveRow(int row, int target);
-		void removeRow(int row);
-		void updateAngleConstraints();
-		void readValuesFromSpinBoxes();
-		void rebuildGridLayoutSpinBoxes();
-		bool collapseSlices();
-		QtCharts::QPieSeries *series;
-		QtCharts::QChartView *chartView;
-		QBrush getColor(std::vector<int>& values);
-
-		std::vector<std::vector<int> >& original_values;
-		std::vector<std::vector<int> > updated_values;
-		std::vector<std::vector<QSpinBox*> > spin_boxes;
-		std::vector<QWidget*> color_widgets;
-		std::vector<QLabel*> spin_box_labels;
-		std::vector<QBrush> colors;
-		std::unordered_map<std::string, QBrush> color_map;
-		int next_color;
+		StrengthFunction* strength_function;
+		std::unordered_map<int, ScenarioStrengthFunctionConfig*> strength_function_scenarios;
 };
 
 #endif // STRENGTHFUNCTIONCONFIG_H

@@ -32,6 +32,7 @@ std::unordered_map<std::string, std::wstring>& MaterialProperty::getTranslate(){
 		MaterialProperty::translate["uw"] = L"Peso Unitario (Unit Weight)";
 		MaterialProperty::translate["c"] = L"Cohesión (Cohesion)";
 		MaterialProperty::translate["phi"] = L"Ángulo de Fricción (Phi)";
+		MaterialProperty::translate["ang"] = L"Ángulo Strength Function (ang)";
 		//MaterialProperty::translate["withru"] = L"Ru (Ru)";
 	}
 	return translate;

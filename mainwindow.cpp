@@ -46,7 +46,8 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
-void MainWindow::openScenarioPromp(){
+void MainWindow::openScenarioPromp()
+{
 	QString filename = QFileDialog::getOpenFileName(this,
 													("Abrir Escenario (.sli)"), "",
 													"Scenarios (*.sli);;Todos los archivos (*)");
@@ -57,7 +58,8 @@ void MainWindow::openScenarioPromp(){
 	ui->statusBar->showMessage("Archivo cargado: " + filename, 20000);
 }
 
-void MainWindow::exportScenariosPromp(){
+void MainWindow::exportScenariosPromp()
+{
 	QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
 												"",
 												QFileDialog::ShowDirsOnly
@@ -84,9 +86,9 @@ void MainWindow::exportScenariosPromp(){
 		if(!material_es->enabled)
 			continue;
 		QString material_scenario_abbr = QString::fromStdString(material_es->abbr);
-		for(const auto& ite2: main_scenario.seismic_escenarios){
+		for (const auto& ite2: main_scenario.seismic_escenarios) {
 			EscenarioSeismicCustom* seismic_es = ite2.second;
-			if(!seismic_es->enabled)
+			if (!seismic_es->enabled)
 				continue;
 			QString seismic_scenario_abbr = QString::fromStdString(seismic_es->abbr);
 			QString filename = dir + "/" +
@@ -105,7 +107,8 @@ void MainWindow::exportScenariosPromp(){
 					printFileParametersLine(_parametros, seismic_es, p, material_es->index,
 											complete_filename.right(complete_filename.length()-dir.length()-1));
 				}
-			}else{
+			}
+			else {
 				filename = filename + ".sli";
 				main_scenario.exportToFile(filename.toStdString(), seismic_es->index, material_es->index, -1);
 				std::cout << "Exported to: " << filename.toStdString() << std::endl;
@@ -123,18 +126,18 @@ void MainWindow::exportScenariosPromp(){
 	msgBox.exec();
 }
 
-void MainWindow::printFileParametersLine(std::wofstream& file, EscenarioSeismicCustom *seismic_es, int property_index, int scenario_index, QString complete_filename){
-	for(Material& material: main_scenario.materials){
+void MainWindow::printFileParametersLine(std::wofstream& file, EscenarioSeismicCustom *seismic_es, int property_index, int scenario_index, QString complete_filename) {
+	for (Material& material: main_scenario.materials) {
 		file << complete_filename.toStdWString() << ",";
 		file << seismic_es->seismic << ",";
 		file << seismic_es->seismicv << ",";
 		file << Utils::toWString(material.name) << ",";
-		for(int p2 = 0; p2 < (int)material.properties.size(); p2++){
+		for (int p2 = 0; p2 < (int)material.properties.size(); p2++) {
 			MaterialProperty& property = material.properties[p2];
-			if(!property.editable)
+			if (!property.editable)
 				continue;
 			int p_index = MaterialProperty::ORIGINAL_VALUE;
-			if(property_index == p2){
+			if (property_index == p2) {
 				p_index = scenario_index;
 			}
 			file << property.getValue(p_index) << ",";
@@ -143,13 +146,13 @@ void MainWindow::printFileParametersLine(std::wofstream& file, EscenarioSeismicC
 	}
 }
 
-void MainWindow::openScenario(std::string filename){
+void MainWindow::openScenario(std::string filename) {
 	clearLayout(ui->widget_seismic->layout());
 	clearLayout(ui->widget_sensibilizar->layout());
 	clearLayout(ui->widget_materials->layout());
-	ui->scrollAreaWidgetContents->layout()->takeAt(0); //Save general material config
-	clearLayout(ui->scrollAreaWidgetContents->layout());
-	clearLayout(ui->scrollAreaWidgetContents_2->layout()); // Strength functions
+	ui->generalPropertiesContainer->layout()->takeAt(0); //Save general material config
+	clearLayout(ui->materialsTab->layout());
+	clearLayout(ui->strengthFunctionsTab->layout()); // Strength functions
 	materials_ui.clear();
 	custom_seismic_schenarios_ui.clear();
 	qcheckbox_property_index.clear();
@@ -175,13 +178,13 @@ void MainWindow::openScenario(std::string filename){
 				std::string(e.what())
 			)
 		);
-		messageBox.setFixedSize(500,200);
+		messageBox.setFixedSize(500, 200);
 	}
 }
 
-void MainWindow::clearLayout(QLayout *layout){
+void MainWindow::clearLayout(QLayout *layout) {
 	QLayoutItem *item;
-	while((item = layout->takeAt(0))) {
+	while ((item = layout->takeAt(0))) {
 		if (item->layout()) {
 			clearLayout(item->layout());
 			delete item->layout();
@@ -193,17 +196,23 @@ void MainWindow::clearLayout(QLayout *layout){
 	}
 }
 
-void MainWindow::addMaterialScenario(int index, QString name, QString abbr){
+void MainWindow::addMaterialScenario(int index, QString name, QString abbr) {
 	EscenarioMaterialCustom* new_scenario = main_scenario.createCustomMaterialScenario(index, name.toStdWString(), abbr.toStdString());
-	for(MaterialConfigUI* config: materials_ui)
+	for (MaterialConfigUI* config: materials_ui)
+		config->escenarioAdded(index, name);
+	for (StrengthFunctionConfig* config: strength_functions_ui)
 		config->escenarioAdded(index, name);
 	QCheckBox* qcheckbox = new QCheckBox(name + " (" + abbr + ")", ui->groupBox_escenarios);
 	qcheckbox->setChecked(true);
-	if(index == MaterialProperty::ORIGINAL_VALUE)
+	if (index == MaterialProperty::ORIGINAL_VALUE)
 		qcheckbox->setDisabled(true);
 	ui->widget_materials->layout()->addWidget(qcheckbox);
-	if(main_scenario.materials.size() > 0)
-		general_material_config.addScenario(new_scenario, main_scenario.materials[0]);
+	for (Material &material: main_scenario.materials) {
+		if (material.type == 0) {
+			general_material_config.addScenario(new_scenario, material);
+			break;
+		}
+	}
 	index_qcheckbox_material_scenario[index] = qcheckbox;
 	qcheckbox_material_scenario_index[qcheckbox] = index;
 	connect(qcheckbox, SIGNAL(toggled(bool)), this, SLOT(toggleMaterialScenario(bool)));
@@ -218,9 +227,11 @@ void MainWindow::addSismicScenario(int index, QString name, QString abbr){
 	ui->widget_seismic->layout()->addWidget(config);
 }
 
-void MainWindow::changedMaterialScenarioName(int index, QString new_name){
+void MainWindow::changedMaterialScenarioName(int index, QString new_name) {
 	EscenarioMaterialCustom* custom = main_scenario.materials_escenarios[index];
-	for(MaterialConfigUI* config: materials_ui)
+	for (MaterialConfigUI* config: materials_ui)
+		config->escenarioChangedName(index, new_name);
+	for (StrengthFunctionConfig* config: strength_functions_ui)
 		config->escenarioChangedName(index, new_name);
 	QCheckBox* checkbox = index_qcheckbox_material_scenario[index];
 	checkbox->setText(new_name + " (" + QString::fromStdString(custom->abbr) + ")");
@@ -228,15 +239,15 @@ void MainWindow::changedMaterialScenarioName(int index, QString new_name){
 	general_material_config.escenarioChangedName(index, new_name);
 }
 
-void MainWindow::changedMaterialScenarioAbbr(int index, QString abbr){
+void MainWindow::changedMaterialScenarioAbbr(int index, QString abbr) {
 	EscenarioMaterialCustom* custom = main_scenario.materials_escenarios[index];
 	QCheckBox* checkbox = index_qcheckbox_material_scenario[index];
 	checkbox->setText(QString::fromStdWString(custom->name) + " ("+abbr+")");
 	custom->abbr = abbr.toStdString();
 }
 
-void MainWindow::removeMaterialScenario(int index){
-	for(MaterialConfigUI* config: materials_ui)
+void MainWindow::removeMaterialScenario(int index) {
+	for (MaterialConfigUI* config: materials_ui)
 		config->escenarioRemoved(index);
 	QCheckBox* checkbox = index_qcheckbox_material_scenario[index];
 	index_qcheckbox_material_scenario.erase(index);
@@ -254,47 +265,59 @@ void MainWindow::removeSeismicScenario(int index){
 	main_scenario.deleteSeismicScenario(index);
 }
 
-void MainWindow::changedSismicName(int index, QString new_name){
+void MainWindow::changedSismicName(int index, QString new_name) {
 	EscenarioSeismicCustom* custom = main_scenario.seismic_escenarios[index];
 	ScenarioSismicConfigUI* config = custom_seismic_schenarios_ui[index];
 	config->setNewName(new_name, QString::fromStdString(custom->abbr));
 }
 
-void MainWindow::changedSismicAbbr(int index, QString abbr){
+void MainWindow::changedSismicAbbr(int index, QString abbr) {
 	EscenarioSeismicCustom* custom = main_scenario.seismic_escenarios[index];
 	ScenarioSismicConfigUI* config = custom_seismic_schenarios_ui[index];
 	config->setNewName(QString::fromStdWString(custom->name), abbr);
 }
 
-void MainWindow::addMaterials(){
-	QStringList str_functions_list;
-	for ( auto it: main_scenario.strength_functions )
-		str_functions_list.append(QString::fromStdString(it.first));
-	ui->scrollAreaWidgetContents->layout()->addWidget(&general_material_config);
+void MainWindow::addMaterials() {
+	ui->generalPropertiesContainer->layout()->addWidget(&general_material_config);
 	for(Material& material: main_scenario.materials){
-		MaterialConfigUI* config = new MaterialConfigUI(this,material, str_functions_list);
+		MaterialConfigUI* config = new MaterialConfigUI(this, material);
 		materials_ui.push_back(config);
-		ui->scrollAreaWidgetContents->layout()->addWidget(config);
+		ui->materialsTab->layout()->addWidget(config);
 	}
 }
 
 void MainWindow::addStrengthFunctions() {
-	for(auto it: main_scenario.strength_functions) {
+	for (auto it: main_scenario.strength_functions) {
 		StrengthFunctionConfig* config = new StrengthFunctionConfig(this, it.second);
-		ui->scrollAreaWidgetContents_2->layout()->addWidget(config);
+		strength_functions_ui.push_back(config);
+		ui->strengthFunctionsTab->layout()->addWidget(config);
 	}
 }
 
 void MainWindow::addProperties(){
-	if(main_scenario.materials.size() == 0)
+	if (main_scenario.materials.size() == 0)
 		return;
-	for(MaterialProperty &property: main_scenario.materials[0].properties){
-		if(!property.editable)
-			continue;
-		QCheckBox* qcheckbox = new QCheckBox(QString::fromStdWString(property.name), ui->widget_sensibilizar);
+	// Add properties from material without strength function
+	for (Material &material: main_scenario.materials) {
+		if (material.type == 0) {
+			for (MaterialProperty &property: main_scenario.materials[0].properties) {
+				if(!property.editable)
+					continue;
+				QCheckBox* qcheckbox = new QCheckBox(QString::fromStdWString(property.name), ui->widget_sensibilizar);
+				qcheckbox->setChecked(true);
+				ui->widget_sensibilizar->layout()->addWidget(qcheckbox);
+				qcheckbox_property_index[qcheckbox] = &property;
+				connect(qcheckbox, SIGNAL(toggled(bool)), this, SLOT(toggleProperty(bool)));
+			}
+			break;
+		}
+	}
+	if (main_scenario.strength_functions.size() != 0) {
+		MaterialProperty *ang_property = new MaterialProperty("ang", 0.0);
+		QCheckBox* qcheckbox = new QCheckBox(QString::fromStdWString(ang_property->name), ui->widget_sensibilizar);
 		qcheckbox->setChecked(true);
 		ui->widget_sensibilizar->layout()->addWidget(qcheckbox);
-		qcheckbox_property_index[qcheckbox] = &property;
+		qcheckbox_property_index[qcheckbox] = ang_property;
 		connect(qcheckbox, SIGNAL(toggled(bool)), this, SLOT(toggleProperty(bool)));
 	}
 }
@@ -302,31 +325,35 @@ void MainWindow::addProperties(){
 void MainWindow::toggleProperty(bool toggled){
 	QCheckBox* checkbox = qobject_cast<QCheckBox *>(sender());
 	MaterialProperty* property = qcheckbox_property_index[checkbox];
-	if(property){
+	if (property) {
+		QString property_short_name = QString::fromStdString(property->short_name);
 		property->active = toggled;
+		for (MaterialConfigUI* material_ui: materials_ui)
+			material_ui->toggleProperty(property_short_name, toggled);
+		for (StrengthFunctionConfig *strength_function_ui: strength_functions_ui)
+			strength_function_ui->toggleProperty(property_short_name, toggled);
+		general_material_config.toggleProperty(property_short_name, toggled);
 	}
-	QWidget* parent = (QWidget*) checkbox->parent();
-	int index = parent->layout()->indexOf(checkbox);
-	for(MaterialConfigUI* material_ui: materials_ui){
-		material_ui->toggleProperty(index, toggled);
-	}
-	general_material_config.toggleProperty(index, toggled);
 }
 
 void MainWindow::toggleMaterialScenario(bool toggled){
 	QCheckBox* checkbox = qobject_cast<QCheckBox *>(sender());
-	int index = qcheckbox_material_scenario_index[checkbox];
-	if(index){
-		for(MaterialConfigUI* material_ui: materials_ui)
-			material_ui->toggleMaterial(index, toggled);
-		main_scenario.materials_escenarios[index]->enabled = toggled;
-		general_material_config.toggleMaterial(index, toggled);
+	if (qcheckbox_material_scenario_index.find(checkbox) != qcheckbox_material_scenario_index.end()) {
+		int index = qcheckbox_material_scenario_index[checkbox];
+		if (index) {
+			for (MaterialConfigUI* material_ui: materials_ui)
+				material_ui->toggleScenario(index, toggled);
+			for (StrengthFunctionConfig* strength_function_ui: strength_functions_ui)
+				strength_function_ui->toggleScenario(index, toggled);
+			main_scenario.materials_escenarios[index]->enabled = toggled;
+			general_material_config.toggleMaterial(index, toggled);
+		}
 	}
 }
 
-void MainWindow::applyPercentaje(double percent, int scenario_index, int property_index){
+void MainWindow::applyPercentaje(double percent, int scenario_index, int property_index) {
 	std::cout << "Apply percentaje "<<percent << " " <<scenario_index<< " " << property_index<<std::endl;
-	for(MaterialConfigUI* material_ui: materials_ui){
+	for (MaterialConfigUI* material_ui: materials_ui) {
 		material_ui->applyPercentaje(percent, scenario_index, property_index);
 	}
 }
