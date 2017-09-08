@@ -18,11 +18,11 @@ class ScenarioMaterialsConfigUI : public QWidget
 		Q_OBJECT
 
 	public:
-		explicit ScenarioMaterialsConfigUI(QWidget *parent, int index, Material &material);
+		explicit ScenarioMaterialsConfigUI(QWidget *parent, int scenario_index, Material &material);
 		~ScenarioMaterialsConfigUI();
 		void setName(QString);
 		void toggleProperty(QString name, bool toggled);
-		void applyPercentaje(double percentaje, int property_index);
+		void applyPercentaje(double percentaje, QString property_short_name);
 		//void setupStrengthsFunctionsCombobox(QStringList& list);
 
 	public slots:
@@ -31,7 +31,7 @@ class ScenarioMaterialsConfigUI : public QWidget
 	private:
 		Ui::ScenarioMaterialsConfigUI *ui;
 		Material& material;
-		int material_index;
+		int scenario_index;
 		std::unordered_map<QDoubleSpinBox*, MaterialProperty*> line_edits_material;
 		std::unordered_map<MaterialProperty*, QDoubleSpinBox*> property_line_edit;
 		QHash<QString, int> property_name_index;

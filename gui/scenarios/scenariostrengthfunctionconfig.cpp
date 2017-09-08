@@ -193,8 +193,12 @@ void ScenarioStrengthFunctionConfig::removeRow(int row) {
 }
 
 void ScenarioStrengthFunctionConfig::applyAngleShift() {
-	this->readValuesFromSpinBoxes();
 	int shift_value = ui->angleShiftSpinBox->value();
+	this->applyAngleShift(shift_value);
+}
+
+void ScenarioStrengthFunctionConfig::applyAngleShift(int shift_value) {
+	this->readValuesFromSpinBoxes();
 	std::cout << "angleShiftSpinBox: " << shift_value << std::endl;
 	for (std::vector<QSpinBox*>& sp: spin_boxes) {
 		sp[0]->blockSignals(true);
@@ -324,3 +328,22 @@ void ScenarioStrengthFunctionConfig::toggleProperty(QString name, bool toggled) 
 		property_toggle_state[index] = toggled;
 	}
 }
+
+void ScenarioStrengthFunctionConfig::applyPercentaje(double percentaje, QString property_short_name) {
+	int index = ScenarioStrengthFunctionConfig::getPropertyIndex(property_short_name);
+	if (index != -1) {
+		if (index == 0) {
+			// Add angle
+			this->applyAngleShift((int) percentaje);
+		}
+		else {
+			// Percentaje
+			for (std::vector<QSpinBox*>& sp: spin_boxes) {
+				int new_value = sp[index]->value();
+				new_value += (int) new_value * (percentaje / 100.0);
+				sp[index]->setValue(new_value);
+			}
+		}
+	}
+}
+

@@ -22,18 +22,19 @@ class MaterialEscenariosGeneralConfig : public QWidget
 		~MaterialEscenariosGeneralConfig();
 		void setName(QString);
 		void toggleProperty(QString name, bool toggled);
+		void addStrengthFunctionProperties();
 
 	public slots:
 		void applyPercentaje();
 
 	signals:
-		void percentajeApplied(double percent, int scenario_index, int property_index);
+		void percentajeApplied(double percent, int scenario_index, QString property_short_name);
 
 	private:
 		Ui::MaterialEscenariosGeneralConfig *ui;
 		int row;
 		int scenario_index;
-		std::unordered_map<QPushButton*, std::pair<int, QDoubleSpinBox*> > buttons_map;
+		QHash<QPushButton*, QPair<QString, QDoubleSpinBox*> > buttons_map;
 		QHash<QString, int> property_name_index;
 };
 

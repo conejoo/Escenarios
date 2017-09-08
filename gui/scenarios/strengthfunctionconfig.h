@@ -23,7 +23,7 @@ class StrengthFunctionConfig : public QWidget
 		void escenarioRemoved(int index);
 		void escenarioAdded(int index, QString name);
 		void escenarioChangedName(int index, QString newname);
-		void applyPercentaje(double percentaje, int scenario_index, int property_index);
+		void applyPercentaje(double percentaje, int scenario_index, QString property_short_name);
 		void toggleScenario(int index, bool show);
 		void toggleProperty(QString name, bool toggled);
 

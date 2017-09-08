@@ -9,33 +9,32 @@
 #include <QComboBox>
 #include <QDoubleSpinBox>
 
-ScenarioMaterialsConfigUI::ScenarioMaterialsConfigUI(QWidget *parent, int index, Material& material) :
+ScenarioMaterialsConfigUI::ScenarioMaterialsConfigUI(QWidget *parent, int scenario_index, Material& material) :
 	QWidget(parent),
 	ui(new Ui::ScenarioMaterialsConfigUI),
 	material(material)
 {
 	ui->setupUi(this);
 	this->str_functions = 0;
-	this->material_index = index;
+	this->scenario_index = scenario_index;
 	//this->read_only = read_only;
 	QFormLayout * grid_layout = qobject_cast<QFormLayout *>(ui->groupBox->layout());
 	for(MaterialProperty &property: material.properties){
 		if(!property.editable)
 			continue;
-		double material_value = property.getValue(MaterialProperty::ORIGINAL_VALUE);
-		property.values[material_index] = material_value;
+		property.values[scenario_index] = property.getValue(MaterialProperty::ORIGINAL_VALUE);
 		QDoubleSpinBox* line_edit = new QDoubleSpinBox();
 		line_edit->setMinimum(0.0);
 		if(property.short_name.compare("phi") == 0)
 			line_edit->setMaximum(90.0);
 		else
 			line_edit->setMaximum(10000000.0);
-		line_edit->setValue(material_value);
+		line_edit->setValue(property.values[scenario_index]);
 		//QString::number(material_value)
 		//line_edit->setReadOnly(read_only);
 		line_edits_material[line_edit] = &property;
 		property_line_edit[&property] = line_edit;
-		if(material_index == MaterialProperty::ORIGINAL_VALUE)
+		if(scenario_index == MaterialProperty::ORIGINAL_VALUE)
 			ui->groupBox->setStyleSheet("QGroupBox, QLabel { color : blue; }");
 		grid_layout->addRow(QString::fromStdWString(property.name), line_edit);
 		property_name_index[QString::fromStdString(property.short_name)] = grid_layout->rowCount() - 1;
@@ -80,19 +79,23 @@ void ScenarioMaterialsConfigUI::toggleProperty(QString name, bool toggled){
 void ScenarioMaterialsConfigUI::updatePropertyValue(double new_value){
 	QDoubleSpinBox* line_edit = qobject_cast<QDoubleSpinBox *>(sender());
 	MaterialProperty* property = line_edits_material[line_edit];
-	property->values[material_index] = new_value;
+	property->values[scenario_index] = new_value;
 }
+
 void ScenarioMaterialsConfigUI::setName(QString name){
 	ui->groupBox->setTitle(name);
 }
-void ScenarioMaterialsConfigUI::applyPercentaje(double percentaje, int property_index){
-	MaterialProperty& property = material.properties[property_index];
-	int orig_index = MaterialProperty::ORIGINAL_VALUE;
-	double new_value = property.values[orig_index];
-	new_value += new_value*(percentaje/100.0);
-	QDoubleSpinBox* spin_box = property_line_edit[&property];
-	if(spin_box){
-		spin_box->setValue(new_value);
-		property.values[material_index] = spin_box->value();
+
+void ScenarioMaterialsConfigUI::applyPercentaje(double percentaje, QString property_short_name){
+	int property_index = material.getPropertyIndex(property_short_name.toStdString());
+	if (property_index != -1) {
+		MaterialProperty& property = material.properties[property_index];
+		double new_value = property.values[MaterialProperty::ORIGINAL_VALUE];
+		new_value += new_value*(percentaje/100.0);
+		QDoubleSpinBox* spin_box = property_line_edit[&property];
+		if (spin_box) {
+			spin_box->setValue(new_value);
+			property.values[scenario_index] = spin_box->value();
+		}
 	}
 }

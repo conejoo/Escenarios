@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(&this->scenarios_config, SIGNAL(changedAbbrSismicScenario(int,QString)), this, SLOT(changedSismicAbbr(int,QString)));
 	connect(&this->scenarios_config, SIGNAL(removedSismicScenario(int)), this, SLOT(removeSeismicScenario(int)));
 	connect(this->ui->actionProcesar_resultados, SIGNAL(triggered()), &this->result_process_ui, SLOT(show()));
-	connect(&general_material_config, SIGNAL(percentajeApplied(double,int,int)), this, SLOT(applyPercentaje(double,int,int)));
+	connect(&general_material_config, SIGNAL(percentajeApplied(double, int, QString)), this, SLOT(applyPercentaje(double, int, QString)));
 }
 
 MainWindow::~MainWindow()
@@ -209,7 +209,7 @@ void MainWindow::addMaterialScenario(int index, QString name, QString abbr) {
 	ui->widget_materials->layout()->addWidget(qcheckbox);
 	for (Material &material: main_scenario.materials) {
 		if (material.type == 0) {
-			general_material_config.addScenario(new_scenario, material);
+			general_material_config.addScenario(new_scenario, material, main_scenario.strength_functions.size() > 0);
 			break;
 		}
 	}
@@ -351,9 +351,10 @@ void MainWindow::toggleMaterialScenario(bool toggled){
 	}
 }
 
-void MainWindow::applyPercentaje(double percent, int scenario_index, int property_index) {
-	std::cout << "Apply percentaje "<<percent << " " <<scenario_index<< " " << property_index<<std::endl;
-	for (MaterialConfigUI* material_ui: materials_ui) {
-		material_ui->applyPercentaje(percent, scenario_index, property_index);
-	}
+void MainWindow::applyPercentaje(double percent, int scenario_index, QString property_short_name) {
+	std::cout << "Apply percentaje "<< percent << " " << scenario_index << " " << property_short_name.toStdString() << std::endl;
+	for (MaterialConfigUI* material_ui: materials_ui)
+		material_ui->applyPercentaje(percent, scenario_index, property_short_name);
+	for (StrengthFunctionConfig *strength_function_ui: strength_functions_ui)
+		strength_function_ui->applyPercentaje(percent, scenario_index, property_short_name);
 }

@@ -62,3 +62,10 @@ std::string Material::toString()
 {
 	return toString(MaterialProperty::ORIGINAL_VALUE, 0);
 }
+
+int Material::getPropertyIndex(std::string short_name) {
+	for (unsigned int i = 0; i < properties.size(); i++)
+		if (properties[i].short_name.compare(short_name) == 0)
+			return i;
+	return -1;
+}

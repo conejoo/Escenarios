@@ -22,6 +22,8 @@ class ScenarioStrengthFunctionConfig : public QWidget
 		explicit ScenarioStrengthFunctionConfig(QWidget *parent = 0, StrengthFunction* function = 0);
 		~ScenarioStrengthFunctionConfig();
 		void toggleProperty(QString name, bool toggled);
+		void applyPercentaje(double percentaje, QString property_short_name);
+		void applyAngleShift(int angle);
 
 	public slots:
 		void changedAngles();

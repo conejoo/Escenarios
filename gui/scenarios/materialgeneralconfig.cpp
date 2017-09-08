@@ -23,14 +23,16 @@ void MaterialGeneralConfig::clearScenarios(){
 	}
 }
 
-void MaterialGeneralConfig::addScenario(EscenarioMaterialCustom* scenario, Material& m){
+void MaterialGeneralConfig::addScenario(EscenarioMaterialCustom* scenario, Material& m, bool strength_functions){
 	MaterialEscenariosGeneralConfig* scenario_config =
 			new MaterialEscenariosGeneralConfig(this, m, scenario->index);
+	if (strength_functions)
+		scenario_config->addStrengthFunctionProperties();
 	scenario_config->setName(QString::fromStdWString(scenario->name));
 	configs[scenario->index] = scenario_config;
 	ui->groupBox->layout()->addWidget(scenario_config);
-	connect(scenario_config, SIGNAL(percentajeApplied(double,int,int)),
-			this, SIGNAL(percentajeApplied(double,int,int)));
+	connect(scenario_config, SIGNAL(percentajeApplied(double, int, QString)),
+			this, SIGNAL(percentajeApplied(double, int, QString)));
 }
 
 

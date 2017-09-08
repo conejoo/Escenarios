@@ -42,7 +42,7 @@ class MainWindow : public QMainWindow
 		void removeSeismicScenario(int);
 		void toggleProperty(bool);
 		void toggleMaterialScenario(bool);
-		void applyPercentaje(double percent, int scenario_index, int property_index);
+		void applyPercentaje(double percent, int scenario_index, QString property_short_name);
 
 	private:
 		Ui::MainWindow *ui;

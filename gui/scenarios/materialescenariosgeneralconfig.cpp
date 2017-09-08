@@ -7,12 +7,12 @@
 
 #include "model/scenarios/materialproperty.h"
 
-MaterialEscenariosGeneralConfig::MaterialEscenariosGeneralConfig(QWidget *parent, Material& material, int index):
+MaterialEscenariosGeneralConfig::MaterialEscenariosGeneralConfig(QWidget *parent, Material& material, int scenario_index):
 	QWidget(parent),
 	ui(new Ui::MaterialEscenariosGeneralConfig)
 {
 	ui->setupUi(this);
-	this->scenario_index = index;
+	this->scenario_index = scenario_index;
 	//this->read_only = read_only;
 	QGridLayout * grid_layout = qobject_cast<QGridLayout *>(ui->groupBox->layout());
 	row = 0;
@@ -20,8 +20,7 @@ MaterialEscenariosGeneralConfig::MaterialEscenariosGeneralConfig(QWidget *parent
 		MaterialProperty &property = material.properties[property_index];
 		if(!property.editable)
 			continue;
-		double material_value = property.getValue(MaterialProperty::ORIGINAL_VALUE);
-		property.values[scenario_index] = material_value;
+		property.values[scenario_index] = property.getValue(MaterialProperty::ORIGINAL_VALUE);
 		QDoubleSpinBox* line_edit = new QDoubleSpinBox();
 		line_edit->setSuffix(QString(" %"));
 		line_edit->setMinimum(-10000000.0);
@@ -37,7 +36,7 @@ MaterialEscenariosGeneralConfig::MaterialEscenariosGeneralConfig(QWidget *parent
 		grid_layout->addWidget(line_edit,row, 1);
 		grid_layout->addWidget(pbutton,row, 2);
 		property_name_index[QString::fromStdString(property.short_name)] = row;
-		buttons_map[pbutton] = std::pair<int, QDoubleSpinBox*>(property_index, line_edit);
+		buttons_map[pbutton] = QPair<QString, QDoubleSpinBox*>(QString::fromStdString(property.short_name), line_edit);
 		connect(pbutton, SIGNAL(clicked()), this, SLOT(applyPercentaje()));
 		row++;
 	}
@@ -46,6 +45,23 @@ MaterialEscenariosGeneralConfig::MaterialEscenariosGeneralConfig(QWidget *parent
 MaterialEscenariosGeneralConfig::~MaterialEscenariosGeneralConfig()
 {
 	delete ui;
+}
+
+void MaterialEscenariosGeneralConfig::addStrengthFunctionProperties(){
+	QGridLayout * grid_layout = qobject_cast<QGridLayout *>(ui->groupBox->layout());
+	int row = grid_layout->rowCount();
+	QDoubleSpinBox* line_edit = new QDoubleSpinBox();
+	line_edit->setSuffix(QString(" °"));
+	line_edit->setMinimum(-10000000.0);
+	line_edit->setMaximum(10000000.0);
+	line_edit->setValue(0.0);
+	QPushButton *pbutton = new QPushButton("Aplicar");
+	grid_layout->addWidget(new QLabel("Angulo (ang)"), row, 0);
+	grid_layout->addWidget(line_edit,row, 1);
+	grid_layout->addWidget(pbutton,row, 2);
+	property_name_index[QString("ang")] = row;
+	buttons_map[pbutton] = QPair<QString, QDoubleSpinBox*>(QString("ang"), line_edit);
+	connect(pbutton, SIGNAL(clicked()), this, SLOT(applyPercentaje()));
 }
 
 void MaterialEscenariosGeneralConfig::setName(QString new_name){
@@ -64,6 +80,8 @@ void MaterialEscenariosGeneralConfig::toggleProperty(QString name, bool toggled)
 
 void MaterialEscenariosGeneralConfig::applyPercentaje(){
 	QPushButton * button = qobject_cast<QPushButton *>(sender());
-	std::pair<int, QDoubleSpinBox*>& res = buttons_map[button];
-	emit percentajeApplied(res.second->value(), scenario_index, res.first);
+	if (buttons_map.find(button) != buttons_map.end()) {
+		QPair<QString, QDoubleSpinBox*>& res = buttons_map[button];
+		emit percentajeApplied(res.second->value(), scenario_index, res.first);
+	}
 }

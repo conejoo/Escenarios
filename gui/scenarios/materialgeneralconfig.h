@@ -20,14 +20,14 @@ class MaterialGeneralConfig : public QWidget
 		explicit MaterialGeneralConfig(QWidget *parent = 0);
 		~MaterialGeneralConfig();
 		void clearScenarios();
-		void addScenario(EscenarioMaterialCustom*, Material& m);
+		void addScenario(EscenarioMaterialCustom*, Material& m, bool strength_functions);
 		void escenarioRemoved(int index);
 		void escenarioChangedName(int index, QString newname);
 		void toggleMaterial(int index, bool show);
 		void toggleProperty(QString name, bool toggled);
 
 	signals:
-		void percentajeApplied(double percent, int scenario_index, int property_index);
+		void percentajeApplied(double percent, int scenario_index, QString property_short_name);
 
 	private:
 		std::unordered_map<int, MaterialEscenariosGeneralConfig*> configs;

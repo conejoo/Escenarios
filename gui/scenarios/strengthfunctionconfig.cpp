@@ -44,10 +44,11 @@ void StrengthFunctionConfig::escenarioChangedName(int index, QString newname){
 	config->setName(newname);
 }
 
-void StrengthFunctionConfig::applyPercentaje(double percentaje, int scenario_index, int property_index){
-	ScenarioStrengthFunctionConfig* config = strength_function_scenarios[scenario_index];
-	if (config) {
-		//config->applyPercentaje(percentaje, property_index);
+void StrengthFunctionConfig::applyPercentaje(double percentaje, int scenario_index, QString property_short_name){
+	if (strength_function_scenarios.find(scenario_index) != strength_function_scenarios.end()) {
+		ScenarioStrengthFunctionConfig* config = strength_function_scenarios[scenario_index];
+		if (config)
+			config->applyPercentaje(percentaje, property_short_name);
 	}
 }
 

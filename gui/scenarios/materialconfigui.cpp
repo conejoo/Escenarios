@@ -24,12 +24,12 @@ void MaterialConfigUI::escenarioRemoved(int index){
 	delete config;
 }
 
-void MaterialConfigUI::escenarioAdded(int index, QString name){
-	ScenarioMaterialsConfigUI* config = new ScenarioMaterialsConfigUI(ui->material_box, index, material);
+void MaterialConfigUI::escenarioAdded(int scenario_index, QString name) {
+	ScenarioMaterialsConfigUI* config = new ScenarioMaterialsConfigUI(ui->material_box, scenario_index, material);
 	config->setName(name);
 //	if (material.type == 6)
 //		config->setupStrengthsFunctionsCombobox(str_functions_list);
-	material_scenarios[index] = config;
+	material_scenarios[scenario_index] = config;
 	ui->material_box->layout()->addWidget(config);
 }
 
@@ -51,10 +51,12 @@ void MaterialConfigUI::toggleScenario(int index, bool show){
 		config->setVisible(show);
 }
 
-void MaterialConfigUI::applyPercentaje(double percentaje, int scenario_index, int property_index){
-	ScenarioMaterialsConfigUI* config = material_scenarios[scenario_index];
-	if(config){
-		config->applyPercentaje(percentaje, property_index);
+void MaterialConfigUI::applyPercentaje(double percentaje, int scenario_index, QString property_short_name){
+	if (material_scenarios.find(scenario_index) != material_scenarios.end()) {
+		ScenarioMaterialsConfigUI* config = material_scenarios[scenario_index];
+		if (config) {
+			config->applyPercentaje(percentaje, property_short_name);
+		}
 	}
 }
 
