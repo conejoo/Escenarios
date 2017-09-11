@@ -24,6 +24,7 @@ class ScenarioStrengthFunctionConfig : public QWidget
 		void toggleProperty(QString name, bool toggled);
 		void applyPercentaje(double percentaje, QString property_short_name);
 		void applyAngleShift(int angle);
+		std::vector<std::vector<int>> getCurrentValues();
 
 	public slots:
 		void changedAngles();
@@ -36,14 +37,17 @@ class ScenarioStrengthFunctionConfig : public QWidget
 		QSpinBox* getAngleSpinBox(int row);
 		std::vector<QSpinBox*> createSpinBoxes(std::vector<int> &values_row);
 		QWidget* createColorWidget(std::vector<int> &values_row);
+		void updateColorWidgets(std::vector<std::vector<int> > &values_row);
 		void setupPieChart(std::vector<std::vector<int> > &values_row);
 		void moveRow(int row, int target);
 		void removeRow(int row);
 		void updateAngleConstraints();
 		void readValuesFromSpinBoxes();
 		void rebuildGridLayoutSpinBoxes();
-		static int getPropertyIndex(QString name);
 		bool collapseSlices();
+
+		static int getPropertyIndex(QString name);
+
 		QtCharts::QPieSeries *series;
 		QtCharts::QChartView *chartView;
 		QBrush getColor(std::vector<int>& values);

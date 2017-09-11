@@ -21,6 +21,9 @@ void MaterialGeneralConfig::clearScenarios(){
 	while((item = ui->groupBox->layout()->takeAt(0))){
 		delete item;
 	}
+	for (auto it: configs)
+		delete it.second;
+	configs.clear();
 }
 
 void MaterialGeneralConfig::addScenario(EscenarioMaterialCustom* scenario, Material& m, bool strength_functions){

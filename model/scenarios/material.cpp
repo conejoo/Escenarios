@@ -46,21 +46,22 @@ Material::Material(std::string material_string, std::string material_description
 	}
 }
 
-std::string Material::toString(int n, int property_index)
+std::string Material::toString(int scenario_index, std::string property_short_name)
 {
 	std::ostringstream result;
-	result << "  " << id << " =";
-	for(int i = 0; i < (int)properties.size(); i++){
-		MaterialProperty &property = properties[i];
-		int index = (i != property_index) ? MaterialProperty::ORIGINAL_VALUE : n;
+	result << "  " << id << " = type: " << type;
+	for (MaterialProperty &property: properties) {
+		int index = (property.short_name.compare(property_short_name) == 0) ? scenario_index : MaterialProperty::ORIGINAL_VALUE;
 		result << " " << property.short_name << ": " << property.getValue(index);
 	}
+	if (type == 6)
+		result << " name: " << strength_fn;
 	return result.str();
 }
 
 std::string Material::toString()
 {
-	return toString(MaterialProperty::ORIGINAL_VALUE, 0);
+	return toString(MaterialProperty::ORIGINAL_VALUE, "propiedad_inexistente");
 }
 
 int Material::getPropertyIndex(std::string short_name) {

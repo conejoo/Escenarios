@@ -53,8 +53,7 @@ int EscenarioFile::find_line_starting_in(int pos, const char* chars, bool throw_
 	return -1;
 }
 
-void EscenarioFile::find_file_sections()
-{
+void EscenarioFile::find_file_sections() {
 	sesmic_position = find_line_starting_in(0, "  seismic:", true);
 	sesmicv_position = find_line_starting_in(sesmic_position, "  seismicv:", true);
 	material_types_position = find_line_starting_in(sesmic_position, "material types:", true);
@@ -72,12 +71,12 @@ void EscenarioFile::process_materials() {
 			materials.push_back(Material(line, description));
 		}
 	}
-	for (Material &m: materials) {
-		if (strength_functions.find(m.strength_fn) != strength_functions.end()) {
-			strength_functions[m.strength_fn]->in_use = true;
-			std::cout << "Function " << m.strength_fn << " USADA"<< std::endl;
-		}
-	}
+//	for (Material &m: materials) {
+//		if (strength_functions.find(m.strength_fn) != strength_functions.end()) {
+//			strength_functions[m.strength_fn]->in_use = true;
+//			std::cout << "Function " << m.strength_fn << " USADA"<< std::endl;
+//		}
+//	}
 }
 
 void EscenarioFile::process_strength_functions() {
@@ -85,20 +84,14 @@ void EscenarioFile::process_strength_functions() {
 	for (int i = strength_functions_start + 1; i < strength_functions_end; i++) {
 		if (std::isdigit(lines[i][0])) {
 			// new fn lines
-			if (current_fn_lines.size() > 0) {
-				// Create strength fn
-				StrengthFunction* fn = new StrengthFunction(current_fn_lines);
-				strength_functions[fn->name] = fn;
-			}
+			if (current_fn_lines.size() > 0) // Create strength fn
+				strength_functions.push_back(new StrengthFunction(current_fn_lines));
 			current_fn_lines.clear();
 		}
 		current_fn_lines.push_back(lines[i]);
 	}
-	if (current_fn_lines.size() > 0) {
-		// Create strength fn
-		StrengthFunction* fn = new StrengthFunction(current_fn_lines);
-		strength_functions[fn->name] = fn;
-	}
+	if (current_fn_lines.size() > 0) // Create strength fn
+		strength_functions.push_back(new StrengthFunction(current_fn_lines));
 }
 
 void EscenarioFile::process_seismic(){
@@ -146,21 +139,25 @@ void EscenarioFile::deleteMaterialScenario(int index){
 	delete custom;
 }
 
-void EscenarioFile::exportToFile(std::string filename, int seismic_index, int material_index, int property_index){
+void EscenarioFile::exportToFile(std::string filename, int seismic_index, int material_index, std::string property_short_name){
 	std::cout << "Exporting to file: " << filename << std::endl;
 	std::ofstream myfile;
 	myfile.open(filename.c_str());
-	for(int i = 0; i < sesmic_position; i++)
+	for (int i = 0; i < sesmic_position; i++)
 		myfile << lines[i] << std::endl;
 	myfile << "  seismic: " << seismic_escenarios[seismic_index]->seismic << std::endl;
-	for(int i = sesmic_position + 1; i < sesmicv_position; i++)
+	for (int i = sesmic_position + 1; i < sesmicv_position; i++)
 		myfile << lines[i] << std::endl;
 	myfile << "  seismicv: " << seismic_escenarios[seismic_index]->seismicv << std::endl;
-	for(int i = sesmicv_position + 1; i <= material_types_position; i++)
+	for (int i = sesmicv_position + 1; i <= material_types_position; i++)
 		myfile << lines[i] << std::endl;
-	for(Material &m: materials)
-		myfile << m.toString(material_index, property_index) << std::endl;
-	for(int i = material_types_end; i < (int)lines.size(); i++)
+	for (Material &m: materials)
+		myfile << m.toString(material_index, property_short_name) << std::endl;
+	for (int i = material_types_end; i <= strength_functions_start; i++)
+		myfile << lines[i] << std::endl;
+	for (StrengthFunction *function: strength_functions)
+		myfile << function->toString(material_index) << std::endl;
+	for(int i = strength_functions_end; i < (int)lines.size(); i++)
 		myfile << lines[i] << std::endl;
 	myfile.close();
 }

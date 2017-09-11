@@ -26,6 +26,7 @@ class StrengthFunctionConfig : public QWidget
 		void applyPercentaje(double percentaje, int scenario_index, QString property_short_name);
 		void toggleScenario(int index, bool show);
 		void toggleProperty(QString name, bool toggled);
+		void readScenariosValues();
 
 	private:
 		Ui::StrengthFunctionConfig *ui;

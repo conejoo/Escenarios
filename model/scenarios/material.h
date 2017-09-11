@@ -14,7 +14,7 @@ class Material
 		Material(std::string material_string, std::string material_description);
 		int getPropertyIndex(std::string short_name);
 		std::string toString();
-		std::string toString(int n, int property_index); // print using n-prop
+		std::string toString(int scenario_index, std::string property_short_name); // print using n-prop
 		std::string id;
 		std::string name;
 		int type;

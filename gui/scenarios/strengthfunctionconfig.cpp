@@ -58,3 +58,12 @@ void StrengthFunctionConfig::toggleProperty(QString name, bool toggled){
 		config->toggleProperty(name, toggled);
 	}
 }
+
+void StrengthFunctionConfig::readScenariosValues() {
+	strength_function->clearScenariosValues();
+	for (auto it: strength_function_scenarios) {
+		int scenario_index = it.first;
+		ScenarioStrengthFunctionConfig *scenario_config = it.second;
+		strength_function->setScenariosValues(scenario_index, scenario_config->getCurrentValues());
+	}
+}

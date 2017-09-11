@@ -75,12 +75,19 @@ void MainWindow::exportScenariosPromp()
 	_parametros << "CCS Vertical" << ",";
 	_parametros << "Material" << ",";
 	{
-		std::vector<MaterialProperty>& props = main_scenario.materials[0].properties;
-		for(MaterialProperty& prop: props)
-			if(prop.editable)
-				_parametros << prop.name << ",";
+		for (Material& material: main_scenario.materials) {
+			if (material.type == 0) {
+				std::vector<MaterialProperty>& props = main_scenario.materials[0].properties;
+				for(MaterialProperty& prop: props)
+					if(prop.editable)
+						_parametros << prop.name << ",";
+				break;
+			}
+		}
 	}
 	_parametros << std::endl;
+	for (StrengthFunctionConfig *config: strength_functions_ui)
+		config->readScenariosValues();
 	for (const auto& ite: main_scenario.materials_escenarios) {
 		EscenarioMaterialCustom* material_es = ite.second;
 		if(!material_es->enabled)
@@ -95,25 +102,26 @@ void MainWindow::exportScenariosPromp()
 				   QString::fromStdString(main_scenario.filename) + "_" +
 				   seismic_scenario_abbr + "_" +
 				   material_scenario_abbr;
-			if(material_es->index != MaterialProperty::ORIGINAL_VALUE){
-				Material& material = main_scenario.materials[0];
-				for(int p = 0; p < (int)material.properties.size(); p++){
-					if(!material.properties[p].active || !material.properties[p].editable)
+			if (material_es->index != MaterialProperty::ORIGINAL_VALUE) {
+				for (auto props: qcheckbox_property_index) {
+					MaterialProperty* property = props.second;
+					if (!property->active || !property->editable || property->short_name.compare("ang") == 0) // No generar archivos para ANG!!
 						continue;
-					QString complete_filename = filename + "_" + QString::fromStdString(material.properties[p].short_name) + ".sli";
-					main_scenario.exportToFile(complete_filename.toStdString(), seismic_es->index, material_es->index, p);
+					std::cout << "Propiedad para exportar: " << property->short_name << std::endl;
+					QString complete_filename = filename + "_" + QString::fromStdString(property->short_name) + ".sli";
+					main_scenario.exportToFile(complete_filename.toStdString(), seismic_es->index, material_es->index, property->short_name);
 					std::cout << "Exported to: " << complete_filename.toStdString() << std::endl;
 					n++;
-					printFileParametersLine(_parametros, seismic_es, p, material_es->index,
+					printFileParametersLine(_parametros, seismic_es, property->short_name, material_es->index,
 											complete_filename.right(complete_filename.length()-dir.length()-1));
 				}
 			}
 			else {
 				filename = filename + ".sli";
-				main_scenario.exportToFile(filename.toStdString(), seismic_es->index, material_es->index, -1);
+				main_scenario.exportToFile(filename.toStdString(), seismic_es->index, material_es->index, "propiedad_inexistente");
 				std::cout << "Exported to: " << filename.toStdString() << std::endl;
 				n++;
-				printFileParametersLine(_parametros, seismic_es, -1, -1,
+				printFileParametersLine(_parametros, seismic_es, "propiedad_inexistente", -1,
 										filename.right(filename.length()-dir.length()-1));
 			}
 		}
@@ -126,20 +134,18 @@ void MainWindow::exportScenariosPromp()
 	msgBox.exec();
 }
 
-void MainWindow::printFileParametersLine(std::wofstream& file, EscenarioSeismicCustom *seismic_es, int property_index, int scenario_index, QString complete_filename) {
+void MainWindow::printFileParametersLine(std::wofstream& file, EscenarioSeismicCustom *seismic_es, std::string property_short_name, int scenario_index, QString complete_filename) {
 	for (Material& material: main_scenario.materials) {
 		file << complete_filename.toStdWString() << ",";
 		file << seismic_es->seismic << ",";
 		file << seismic_es->seismicv << ",";
 		file << Utils::toWString(material.name) << ",";
-		for (int p2 = 0; p2 < (int)material.properties.size(); p2++) {
-			MaterialProperty& property = material.properties[p2];
+		for (MaterialProperty &property: material.properties) {
 			if (!property.editable)
 				continue;
 			int p_index = MaterialProperty::ORIGINAL_VALUE;
-			if (property_index == p2) {
+			if (property.short_name.compare(property_short_name) == 0)
 				p_index = scenario_index;
-			}
 			file << property.getValue(p_index) << ",";
 		}
 		file << std::endl;
@@ -154,16 +160,17 @@ void MainWindow::openScenario(std::string filename) {
 	clearLayout(ui->materialsTab->layout());
 	clearLayout(ui->strengthFunctionsTab->layout()); // Strength functions
 	materials_ui.clear();
+	strength_functions_ui.clear();
 	custom_seismic_schenarios_ui.clear();
 	qcheckbox_property_index.clear();
 	qcheckbox_material_scenario_index.clear();
 	index_qcheckbox_material_scenario.clear();
+	general_material_config.clearScenarios();
 	try {
 		main_scenario = EscenarioFile(filename);
 		addProperties();
 		addMaterials();
 		addStrengthFunctions();
-		general_material_config.clearScenarios();
 		scenarios_config.setScenarioFile(&main_scenario);
 		result_process_ui.setEscenarioFile(main_scenario);
 	}
@@ -249,6 +256,8 @@ void MainWindow::changedMaterialScenarioAbbr(int index, QString abbr) {
 void MainWindow::removeMaterialScenario(int index) {
 	for (MaterialConfigUI* config: materials_ui)
 		config->escenarioRemoved(index);
+	for (StrengthFunctionConfig *config: strength_functions_ui)
+		config->escenarioRemoved(index);
 	QCheckBox* checkbox = index_qcheckbox_material_scenario[index];
 	index_qcheckbox_material_scenario.erase(index);
 	qcheckbox_material_scenario_index.erase(checkbox);
@@ -287,8 +296,8 @@ void MainWindow::addMaterials() {
 }
 
 void MainWindow::addStrengthFunctions() {
-	for (auto it: main_scenario.strength_functions) {
-		StrengthFunctionConfig* config = new StrengthFunctionConfig(this, it.second);
+	for (StrengthFunction* function: main_scenario.strength_functions) {
+		StrengthFunctionConfig* config = new StrengthFunctionConfig(this, function);
 		strength_functions_ui.push_back(config);
 		ui->strengthFunctionsTab->layout()->addWidget(config);
 	}

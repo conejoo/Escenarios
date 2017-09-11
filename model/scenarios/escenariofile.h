@@ -20,7 +20,7 @@ class EscenarioFile
 		EscenarioMaterialCustom* createCustomMaterialScenario(int index, std::wstring name, std::string abbr);
 		void deleteSeismicScenario(int index);
 		void deleteMaterialScenario(int index);
-		void exportToFile(std::string filename, int seismic_index, int material_index, int property_index);
+		void exportToFile(std::string filename, int seismic_index, int material_index, std::string property_short_name);
 		int find_line_starting_in(int pos, const char* chars, bool throw_exception=false);
 		int find_empty_line(int pos);
 		void find_file_sections();
@@ -29,7 +29,7 @@ class EscenarioFile
 		void process_strength_functions();
 		std::vector<std::string> lines;
 		std::vector<Material> materials;
-		std::unordered_map<std::string, StrengthFunction*> strength_functions;
+		std::vector<StrengthFunction*> strength_functions;
 		std::unordered_map<int, EscenarioSeismicCustom*> seismic_escenarios;
 		std::unordered_map<int, EscenarioMaterialCustom*> materials_escenarios;
 		double base_seismic, base_seismicv;

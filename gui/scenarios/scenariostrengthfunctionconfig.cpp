@@ -38,7 +38,7 @@ ScenarioStrengthFunctionConfig::ScenarioStrengthFunctionConfig(QWidget *parent, 
 	this->series = new QtCharts::QPieSeries();
 	QtCharts::QChart *chart = new QtCharts::QChart();
 	chart->layout()->setContentsMargins(0, 0, 0, 0);
-	chart->setBackgroundVisible(false);
+	//chart->setBackgroundVisible(false);
 	chart->setMargins(QMargins());
 	chart->setMinimumHeight(100);
 	chart->setPlotAreaBackgroundVisible(false);
@@ -89,6 +89,14 @@ void ScenarioStrengthFunctionConfig::setupPieChart(std::vector<std::vector<int> 
 //	chartView->repaint();
 }
 
+void ScenarioStrengthFunctionConfig::updateColorWidgets(std::vector<std::vector<int> > &values_row) {
+	for (unsigned int row = 0; row < values_row.size(); row++) {
+		QPalette pal;
+		pal.setColor(QPalette::ColorRole::Background, this->getColor(values_row[row]).color());
+		color_widgets[row]->setPalette(pal);
+	}
+}
+
 QWidget* ScenarioStrengthFunctionConfig::createColorWidget(std::vector<int> &values_row) {
 	QWidget *widget = new QWidget();
 	widget->setMinimumWidth(30);
@@ -128,6 +136,7 @@ QBrush ScenarioStrengthFunctionConfig::getColor(std::vector<int>& values) {
 void ScenarioStrengthFunctionConfig::changedAngles() {
 	this->updateAngleConstraints();
 	this->setupPieChart(this->updated_values);
+	this->updateColorWidgets(this->updated_values);
 	std::cout << "Update angle constraints!" << std::endl;
 }
 
@@ -314,10 +323,7 @@ void ScenarioStrengthFunctionConfig::setName(QString name) {
 }
 
 int ScenarioStrengthFunctionConfig::getPropertyIndex(QString name) {
-	if (name.compare("ang") == 0) return 0;
-	if (name.compare("c") == 0) return 1;
-	if (name.compare("phi") == 0) return 2;
-	return -1;
+	return StrengthFunction::getPropertyIndex(name.toStdString());
 }
 
 void ScenarioStrengthFunctionConfig::toggleProperty(QString name, bool toggled) {
@@ -326,6 +332,11 @@ void ScenarioStrengthFunctionConfig::toggleProperty(QString name, bool toggled) 
 		for (std::vector<QSpinBox*>& sp: spin_boxes)
 			sp[index]->setEnabled(toggled);
 		property_toggle_state[index] = toggled;
+		if (index == 0) {
+			// Angle
+			ui->angleShiftSpinBox->setEnabled(toggled);
+			ui->applyAngleShiftButton->setEnabled(toggled);
+		}
 	}
 }
 
@@ -347,3 +358,7 @@ void ScenarioStrengthFunctionConfig::applyPercentaje(double percentaje, QString 
 	}
 }
 
+std::vector<std::vector<int>> ScenarioStrengthFunctionConfig::getCurrentValues() {
+	this->readValuesFromSpinBoxes();
+	return updated_values;
+}
