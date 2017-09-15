@@ -1,6 +1,7 @@
 #ifndef RESULTMETHOD_H
 #define RESULTMETHOD_H
 
+#include <string>
 #include <unordered_map>
 #include <utility>
 

@@ -6,9 +6,42 @@
 #include <fstream>
 #include <locale>
 #include <iostream>
+#include <algorithm>
+#include <math.h>
 
 #include "utils.h"
 #include "model/results/resultfile.h"
+
+// Implementation of the NORMDIST excel function
+// https://stackoverflow.com/questions/4934217/magic-numbers-in-c-implementation-of-excel-normdist-function
+static double normdist(double y, double mean, double standard_dev)
+{
+    double res;
+    double x = (y - mean) / standard_dev;
+    if (x == 0)
+    {
+        res=0.5;
+    }
+    else
+    {
+        double oor2pi = 1/(sqrt(double(2) * 3.14159265358979323846));
+        double t = 1 / (double(1) + 0.2316419 * fabs(x));
+        t *= oor2pi * exp(-0.5 * x * x)
+             * (0.31938153   + t
+             * (-0.356563782 + t
+             * (1.781477937  + t
+             * (-1.821255978 + t * 1.330274429))));
+        if (x >= 0)
+        {
+            res = double(1) - t;
+        }
+        else
+        {
+            res = t;
+        }
+    }
+    return res;
+}
 
 ResultsProcessUI::ResultsProcessUI(EscenarioFile& es, QWidget *parent) :
 	QWidget(parent, Qt::Tool| Qt::Window | Qt::CustomizeWindowHint| Qt::WindowMinimizeButtonHint |Qt::WindowCloseButtonHint),
@@ -48,6 +81,7 @@ void ResultsProcessUI::resetFiles(){
 	ui->label_resume->setText(QString::number(results.size()) + " Archivos cargados...");
 	countAddedFiles();
 }
+
 void ResultsProcessUI::openProcessFiles(const QStringList & filenames){
 	if(filenames.size() == 0)
 		return; // cancel
@@ -70,10 +104,9 @@ void ResultsProcessUI::openProcessFiles(const QStringList & filenames){
 void ResultsProcessUI::loadFilesPromp(){
 	custom_file_dialog.openDialog();
 	return;
-	QStringList filenames = QFileDialog::getOpenFileNames(this,
-													("Abrir resultados (.s01)"), "",
-													"Resultados (*.s01);;Todos los archivos (*)");
-
+    QStringList filenames = QFileDialog::getOpenFileNames(this,
+                                                          ("Abrir resultados (.s01)"), "",
+                                                          "Resultados (*.s01);;Todos los archivos (*)");
 }
 
 void ResultsProcessUI::addResultFile(){
@@ -123,14 +156,18 @@ void ResultsProcessUI::exportResultsPromp(){
 		msgBox.exec();
 		return;
 	}
-	QString filename = QFileDialog::getSaveFileName(this, "Save file", "",
-											   "CSV File (*.csv);;All files (*.*)");
-	if(filename.size() == 0)
+
+    QString filename = QFileDialog::getSaveFileName(this, "Save file", "", "CSV File (*.csv);;All files (*.*)");
+    if(filename.size() == 0)
 		return; // cancel
-	std::string std_filename = filename.toStdString();
-	std::wofstream myfile;
+
+    std::string std_filename = filename.toStdString();
+    std::string std_summary_filename = std_filename.substr(0, std_filename.find(".")) + "_summary.csv";
+    std::wofstream myfile, summaryFile;
 	myfile.open(std_filename.c_str());
-	//header
+    summaryFile.open(std_summary_filename.c_str());
+
+    //header
 	myfile << L"Archivo,Método,";
 	myfile << L"Escenario Sísmico,";
 	myfile << L"Variable sensible,";
@@ -141,13 +178,29 @@ void ResultsProcessUI::exportResultsPromp(){
 	myfile << Utils::toWString(addUnit("Resisting Horizontal Force")) << ",";
 	myfile << Utils::toWString(addUnit("Driving Horizontal Force")) << ",";
 	myfile << Utils::toWString(addUnit("Total Slice Area")) << std::endl;
+
+    std::map<std::string, std::map<std::string, std::map<std::string, double>>> summary;
+
 	for(ResultFile* rs: results){
-//		if(!rs->included)
-//			continue;
+
 		for(ResultMethod& method: rs->methods){
 			myfile << Utils::toWString(rs->filename) << ",";
 			myfile << Utils::toWString(method.name) << ",";
-			if(isMedMaterialScenario(rs->sensible)){
+
+            // This will be used to fill the summary CSV file
+            // Only take into account information about the gle method!
+            if (method.name.find("gle") != std::string::npos){
+                if(isMedMaterialScenario(rs->sensible))
+                {
+                    summary[rs->material_scenario]["-"][rs->sensible] = std::stod(method.getValue("FS").first);
+                }
+                else
+                {
+                    summary[rs->seismic_scenario][rs->sensible][rs->material_scenario] = std::stod(method.getValue("FS").first);
+                }
+            }
+
+            if(isMedMaterialScenario(rs->sensible)){
 				if(areTranslatables(rs->material_scenario, rs->sensible)){
 					myfile << translateSeismicScenario(rs->material_scenario) << ",";
 					myfile << "" << ",";
@@ -173,11 +226,67 @@ void ResultsProcessUI::exportResultsPromp(){
 			myfile << std::endl;
 		}
 	}
+
+
+    summaryFile << L"Casos,";
+    summaryFile << L"FS base,";
+    summaryFile << L"Probabilidad de Falla,";
+    summaryFile << L"Media,";
+    summaryFile << L"Desviación Estándar,";
+    summaryFile << L"C FS min,";
+    summaryFile << L"C FS max,";
+    summaryFile << L"C FS delta,";
+    summaryFile << L"Phi FS min,";
+    summaryFile << L"Phi FS max,";
+    summaryFile << L"Phi FS delta,";
+    summaryFile << L"Ang FS min,";
+    summaryFile << L"Ang FS max,";
+    summaryFile << L"Ang FS delta,";
+    summaryFile << std::endl;
+
+    // Filling the summary CSV file
+    for (auto const& sismic_index : summary)
+    {
+        auto sensible_index = sismic_index.second;
+        sensible_index["c"]["delta"] = sensible_index["c"]["max"] - sensible_index["c"]["min"];
+        sensible_index["phi"]["delta"] = sensible_index["phi"]["max"] - sensible_index["phi"]["min"];
+        sensible_index["uw"]["delta"] = sensible_index["uw"]["max"] - sensible_index["uw"]["min"];
+        auto seismic_avg = (sensible_index["c"]["min"] + sensible_index["c"]["max"] + sensible_index["phi"]["min"] + sensible_index["phi"]["max"] + sensible_index["uw"]["min"] + sensible_index["uw"]["max"]) / 6.0;
+        auto seismic_sd = sqrt(pow(sensible_index["c"]["delta"] / 2.0, 2) + pow(sensible_index["phi"]["delta"] / 2.0, 2) + pow(sensible_index["uw"]["delta"] / 2.0, 2));
+
+        summaryFile << translateSeismicScenario(sismic_index.first) << ",";
+        summaryFile << sensible_index["-"]["med"] << ",";
+
+        // probabilidad de falla (excel =NORMDIST(1,E5,F5,TRUE))
+        summaryFile << normdist(1.0, seismic_avg, seismic_sd) << ",";
+
+        // promedio
+        summaryFile << seismic_avg << ",";
+
+        // desviación estándar
+        summaryFile << seismic_sd << ",";
+
+        summaryFile << sensible_index["c"]["min"] << ",";
+        summaryFile << sensible_index["c"]["max"] << ",";
+        summaryFile << sensible_index["c"]["delta"] << ",";
+
+        summaryFile << sensible_index["phi"]["min"] << ",";
+        summaryFile << sensible_index["phi"]["max"] << ",";
+        summaryFile << sensible_index["phi"]["delta"] << ",";
+
+        summaryFile << sensible_index["uw"]["min"] << ",";
+        summaryFile << sensible_index["uw"]["max"] << ",";
+        summaryFile << sensible_index["uw"]["delta"];
+
+        summaryFile << std::endl;
+    }
+    summaryFile.close();
 	myfile.close();
 	QMessageBox msgBox;
 	msgBox.setText("CSV exportado con éxito a " + filename);
 	msgBox.exec();
 }
+
 std::string ResultsProcessUI::addUnit(const char* name){
 	std::string sname(name);
 	for(ResultFile* rs: results){

@@ -42,10 +42,19 @@ void ResultFile::processFileName(){
 	file_split.pop_back();
 	seismic_scenario = file_split[file_split.size()-1];
 	file_split.pop_back();
+  //  std::cout << "############################" << std::endl;
+  //  std::cout << "ResultFile::processFileName:" << std::endl;
+  //  std::cout << "sensible: " << sensible << std::endl;
+  //  std::cout << "material_scenario: " << material_scenario << std::endl;
+  //  std::cout << "seismic_scenario: " << seismic_scenario << std::endl;
+  //  std::cout << "############################" << std::endl;
 	std::cout << "Si se pudo procesar nombre de archivo: " << filename << " Sensible: " << sensible<< std::endl;
 }
 
 void ResultFile::processFileData(){
+    /*
+     *  Reading Global Minimun FS section.
+    */
 	global_minimum_fs_pos = findLineStartingIn(0, "* Global Minimum FS");
 	global_minimum_text_pos = findLineStartingIn(global_minimum_fs_pos, "* Global Minimum Text");
 	int nmethods = global_minimum_text_pos-global_minimum_fs_pos-1;
@@ -62,10 +71,18 @@ void ResultFile::processFileData(){
 		while(stream >> token)
 			name += token + " ";
 		name = Utils::trim(name);
+    //    std::cout << "############################" << std::endl;
+    //    std::cout << "name: " << name << std::endl;
+    //    std::cout << "fs: " << fs << std::endl;
+    //    std::cout << "############################" << std::endl;
 		ResultMethod method(name);
 		method.values["FS"] = std::pair<std::string, std::string>(fs,"");
 		methods.push_back(method);
 	}
+
+    /*
+     *  Reading properties that come after the Global Minimun FS.
+    */
 	int start = global_minimum_text_pos + 1;
 	for(ResultMethod& method: methods){
 		int n = 0;
