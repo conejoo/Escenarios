@@ -15,6 +15,10 @@
 #include "gui/scenarios/scenariosismicconfigui.h"
 #include "gui/scenarios/strengthfunctionconfig.h"
 
+// Copiar DLL's a la carpeta: windeployqt.exe
+// https://stackoverflow.com/questions/6771039/automatic-copy-of-dependent-files-in-qt-creator
+// G:\Desarrollo\QtProjects\build-Escenarios-Desktop_Qt_5_9_1_MinGW_32bit-Release\release>D:\Desarrollo\Qt\5.9.1\mingw53_32\bin\windeployqt.exe Escenarios.exe
+
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
