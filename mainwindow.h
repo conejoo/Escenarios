@@ -8,6 +8,7 @@
 #include "gui/scenarios/scenariosconfigui.h"
 #include "gui/scenarios/materialgeneralconfig.h"
 #include "gui/results/resultsprocessui.h"
+#include "gui/aboutrtb.h"
 
 class MaterialConfigUI;
 class StrengthFunctionConfig;
@@ -53,6 +54,7 @@ class MainWindow : public QMainWindow
 		std::unordered_map<int, QCheckBox*> index_qcheckbox_material_scenario;
 		std::unordered_map<QCheckBox*, int> qcheckbox_material_scenario_index;
 		EscenarioFile main_scenario;
+		AboutRTB about;
 		ScenariosConfigUI scenarios_config;
 		ResultsProcessUI result_process_ui;
 		MaterialGeneralConfig general_material_config;

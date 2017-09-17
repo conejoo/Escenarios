@@ -3,7 +3,7 @@
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
+   <enum>Qt::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -15,6 +15,10 @@
   </property>
   <property name="windowTitle">
    <string>RTB</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icon/rtb_icon128_zeV_12.ico</normaloff>icon/rtb_icon128_zeV_12.ico</iconset>
   </property>
   <property name="statusTip">
    <string/>
@@ -291,8 +295,15 @@
     </property>
     <addaction name="actionConfigurate_Scenarios"/>
    </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>Ayuda</string>
+    </property>
+    <addaction name="actionAcerca_de_RTB"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuConfig"/>
+   <addaction name="menuAbout"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -326,6 +337,11 @@
   <action name="actionProcesar_resultados">
    <property name="text">
     <string>Procesar Resultados...</string>
+   </property>
+  </action>
+  <action name="actionAcerca_de_RTB">
+   <property name="text">
+    <string>Acerca de RTB</string>
    </property>
   </action>
  </widget>

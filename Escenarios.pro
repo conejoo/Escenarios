@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     model/scenarios/materialproperty.cpp \
     model/scenarios/strengthfunction.cpp \
     gui/scenarios/scenariostrengthfunctionconfig.cpp \
-    gui/scenarios/strengthfunctionconfig.cpp
+    gui/scenarios/strengthfunctionconfig.cpp \
+    gui/aboutrtb.cpp
 
 HEADERS  += mainwindow.h \
     gui/results/customfiledialognewlayout.h \
@@ -54,7 +55,8 @@ HEADERS  += mainwindow.h \
     utils.h \
     model/scenarios/strengthfunction.h \
     gui/scenarios/scenariostrengthfunctionconfig.h \
-    gui/scenarios/strengthfunctionconfig.h
+    gui/scenarios/strengthfunctionconfig.h \
+    gui/aboutrtb.h
 
 FORMS    += mainwindow.ui \
     gui/results/customfiledialognewlayout.ui \
@@ -66,4 +68,7 @@ FORMS    += mainwindow.ui \
     gui/scenarios/scenariosconfigui.ui \
     gui/scenarios/scenariosismicconfigui.ui \
     gui/scenarios/scenariostrengthfunctionconfig.ui \
-    gui/scenarios/strengthfunctionconfig.ui
+    gui/scenarios/strengthfunctionconfig.ui \
+    gui/aboutrtb.ui
+
+RC_ICONS = icon/rtb_icon128_zeV_12.ico

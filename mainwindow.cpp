@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	this->showMaximized();
 	connect(this->ui->actionOpen_Scenario, SIGNAL(triggered()), this, SLOT(openScenarioPromp()));
 	connect(this->ui->actionExport, SIGNAL(triggered()), this, SLOT(exportScenariosPromp()));
+	connect(this->ui->actionAcerca_de_RTB,SIGNAL(triggered()),&this->about, SLOT(show()));
 	connect(this->ui->actionConfigurate_Scenarios, SIGNAL(triggered()), &this->scenarios_config, SLOT(show()));
 	connect(&this->scenarios_config, SIGNAL(addedMaterialScenario(int,QString,QString)), this, SLOT(addMaterialScenario(int,QString,QString)));
 	connect(&this->scenarios_config, SIGNAL(changedNameMaterialScenario(int,QString)), this, SLOT(changedMaterialScenarioName(int,QString)));
