@@ -58,7 +58,7 @@ class MainWindow : public QMainWindow
 		ScenariosConfigUI scenarios_config;
 		ResultsProcessUI result_process_ui;
 		MaterialGeneralConfig general_material_config;
-		void printFileParametersLine(std::wofstream& file, EscenarioSeismicCustom* seismic_es, std::string property_short_name, int scenario_index, QString complete_filename);
+		void printFileParametersLine(std::wofstream& file, EscenarioSeismicCustom* seismic_es, std::string property_short_name, int scenario_index, QString complete_filename, std::vector<std::string>& type_0_property_short_names);
 };
 
 #endif // MAINWINDOW_H

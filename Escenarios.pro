@@ -34,7 +34,9 @@ SOURCES += main.cpp\
     model/scenarios/strengthfunction.cpp \
     gui/scenarios/scenariostrengthfunctionconfig.cpp \
     gui/scenarios/strengthfunctionconfig.cpp \
-    gui/aboutrtb.cpp
+    gui/aboutrtb.cpp \
+    model/scenarios/strengthfunctionpieslice.cpp \
+    gui/utils/qspinboxwithdata.cpp
 
 HEADERS  += mainwindow.h \
     gui/results/customfiledialognewlayout.h \
@@ -56,7 +58,9 @@ HEADERS  += mainwindow.h \
     model/scenarios/strengthfunction.h \
     gui/scenarios/scenariostrengthfunctionconfig.h \
     gui/scenarios/strengthfunctionconfig.h \
-    gui/aboutrtb.h
+    gui/aboutrtb.h \
+    model/scenarios/strengthfunctionpieslice.h \
+    gui/utils/qspinboxwithdata.h
 
 FORMS    += mainwindow.ui \
     gui/results/customfiledialognewlayout.ui \

@@ -3,12 +3,13 @@
 
 #include <QWidget>
 #include <unordered_map>
+#include "model/scenarios/strengthfunctionpieslice.h"
 
 namespace Ui {
 class ScenarioStrengthFunctionConfig;
 }
 class StrengthFunction;
-class QSpinBox;
+class QSpinBoxWithData;
 class QLabel;
 namespace QtCharts {
 class QPieSeries;
@@ -24,21 +25,22 @@ class ScenarioStrengthFunctionConfig : public QWidget
 		void toggleProperty(QString name, bool toggled);
 		void applyPercentaje(double percentaje, QString property_short_name);
 		void applyAngleShift(int angle);
-		std::vector<std::vector<int>> getCurrentValues();
+		std::vector<StrengthFunctionPieSlice> getCurrentValues();
 
 	public slots:
 		void changedAngles();
+		void changedOtherValue();
 		void applyAngleShift();
 		void setName(QString name);
 
 	private:
 		Ui::ScenarioStrengthFunctionConfig *ui;
 		StrengthFunction* function;
-		QSpinBox* getAngleSpinBox(int row);
-		std::vector<QSpinBox*> createSpinBoxes(std::vector<int> &values_row);
-		QWidget* createColorWidget(std::vector<int> &values_row);
-		void updateColorWidgets(std::vector<std::vector<int> > &values_row);
-		void setupPieChart(std::vector<std::vector<int> > &values_row);
+		QSpinBoxWithData* getAngleSpinBox(int row);
+		std::vector<QSpinBoxWithData*> createSpinBoxes(StrengthFunctionPieSlice &values_row);
+		QWidget* createColorWidget(StrengthFunctionPieSlice &values_row);
+		void updateColorWidgets(std::vector<StrengthFunctionPieSlice> &values_row);
+		void setupPieChart(std::vector<StrengthFunctionPieSlice> &values_row);
 		void moveRow(int row, int target);
 		void removeRow(int row);
 		void updateAngleConstraints();
@@ -47,14 +49,16 @@ class ScenarioStrengthFunctionConfig : public QWidget
 		bool collapseSlices();
 
 		static int getPropertyIndex(QString name);
+		static const int PIE_SLICE_MATERIAL_KEY = 1;
+		static const int PIE_SLICE_PROPERTY_INDEX = 2;
 
 		QtCharts::QPieSeries *series;
 		QtCharts::QChartView *chartView;
-		QBrush getColor(std::vector<int>& values);
+		QBrush getColor(StrengthFunctionPieSlice &values);
 
-		std::vector<std::vector<int> >& original_values;
-		std::vector<std::vector<int> > updated_values;
-		std::vector<std::vector<QSpinBox*> > spin_boxes;
+		std::vector<StrengthFunctionPieSlice>& original_values;
+		std::vector<StrengthFunctionPieSlice> updated_values;
+		std::vector<std::vector<QSpinBoxWithData*> > spin_boxes;
 		std::vector<QWidget*> color_widgets;
 		std::vector<QLabel*> spin_box_labels;
 		std::vector<QBrush> colors;

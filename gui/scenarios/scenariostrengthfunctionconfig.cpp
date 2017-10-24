@@ -1,10 +1,10 @@
 #include "scenariostrengthfunctionconfig.h"
 #include "ui_scenariostrengthfunctionconfig.h"
 #include "model/scenarios/strengthfunction.h"
+#include "gui/utils/qspinboxwithdata.h"
 
 #include <iostream>
 
-#include <QSpinBox>
 #include <QLabel>
 #include <QPalette>
 #include <QtCharts/QChartView>
@@ -65,7 +65,7 @@ ScenarioStrengthFunctionConfig::~ScenarioStrengthFunctionConfig()
 	delete ui;
 }
 
-void ScenarioStrengthFunctionConfig::setupPieChart(std::vector<std::vector<int> > &values_row) {
+void ScenarioStrengthFunctionConfig::setupPieChart(std::vector<StrengthFunctionPieSlice> &values_row) {
 	series->clear();
 	for (unsigned int i = 0; i < values_row.size(); i++) {
 		int value = spin_boxes[i][0]->value() + 90;
@@ -89,7 +89,7 @@ void ScenarioStrengthFunctionConfig::setupPieChart(std::vector<std::vector<int> 
 //	chartView->repaint();
 }
 
-void ScenarioStrengthFunctionConfig::updateColorWidgets(std::vector<std::vector<int> > &values_row) {
+void ScenarioStrengthFunctionConfig::updateColorWidgets(std::vector<StrengthFunctionPieSlice> &values_row) {
 	for (unsigned int row = 0; row < values_row.size(); row++) {
 		QPalette pal;
 		pal.setColor(QPalette::ColorRole::Background, this->getColor(values_row[row]).color());
@@ -97,7 +97,7 @@ void ScenarioStrengthFunctionConfig::updateColorWidgets(std::vector<std::vector<
 	}
 }
 
-QWidget* ScenarioStrengthFunctionConfig::createColorWidget(std::vector<int> &values_row) {
+QWidget* ScenarioStrengthFunctionConfig::createColorWidget(StrengthFunctionPieSlice &values_row) {
 	QWidget *widget = new QWidget();
 	widget->setMinimumWidth(30);
 	QPalette pal;
@@ -108,29 +108,46 @@ QWidget* ScenarioStrengthFunctionConfig::createColorWidget(std::vector<int> &val
 	return widget;
 }
 
-std::vector<QSpinBox *> ScenarioStrengthFunctionConfig::createSpinBoxes(std::vector<int> &values_row) {
-	std::vector<QSpinBox*> row_spin_boxes;
-	for (unsigned int i = 0; i < values_row.size(); i++) {
-		QSpinBox* line_edit = new QSpinBox();
+std::vector<QSpinBoxWithData *> ScenarioStrengthFunctionConfig::createSpinBoxes(StrengthFunctionPieSlice &values_row) {
+	std::vector<QSpinBoxWithData*> row_spin_boxes;
+	for (unsigned int i = 0; i < 3; i++) {
+		QSpinBoxWithData* line_edit = new QSpinBoxWithData();
+		line_edit->putData(PIE_SLICE_MATERIAL_KEY, values_row.material_index);
+		line_edit->putData(PIE_SLICE_PROPERTY_INDEX, i);
 		line_edit->setRange(-100000, 100000);
-		line_edit->setValue(values_row[i]);
+		line_edit->setValue(values_row.getValue(i));
 		if (i == 0) {
 			connect(line_edit, SIGNAL(valueChanged(int)), this, SLOT(changedAngles()));
 			line_edit->setSuffix(QString(" °"));
+		}
+		else {
+			connect(line_edit, SIGNAL(valueChanged(int)), this, SLOT(changedOtherValue()));
 		}
 		line_edit->setEnabled(property_toggle_state[i]);
 		row_spin_boxes.push_back(line_edit);
 	}
 	return row_spin_boxes;
 }
-QBrush ScenarioStrengthFunctionConfig::getColor(std::vector<int>& values) {
-	std::string key = QStringLiteral("serie_%1_%1").arg(values[1], values[2]).toStdString();
+QBrush ScenarioStrengthFunctionConfig::getColor(StrengthFunctionPieSlice& values) {
+	std::string key = QStringLiteral("serie_%1_%1").arg(values.cohesion, values.phi).toStdString();
 	if (this->color_map.find(key) == this->color_map.end()) {
 		// not found
 		this->color_map[key] = this->colors[next_color];
 		this->next_color = (this->next_color + 1) % this->colors.size();
 	}
 	return this->color_map[key];
+}
+
+void ScenarioStrengthFunctionConfig::changedOtherValue() {
+	QSpinBoxWithData * qspinbox = qobject_cast<QSpinBoxWithData *>(sender());
+	int pie_material_index = qspinbox->getData(PIE_SLICE_MATERIAL_KEY);
+	int pie_property_index = qspinbox->getData(PIE_SLICE_PROPERTY_INDEX);
+	for (std::vector<QSpinBoxWithData*>& row: spin_boxes) {
+		if(row[pie_property_index] != qspinbox &&
+				row[pie_property_index]->getData(PIE_SLICE_MATERIAL_KEY) == pie_material_index) {
+			row[pie_property_index]->setValueBlockingSignals(qspinbox->value());
+		}
+	}
 }
 
 void ScenarioStrengthFunctionConfig::changedAngles() {
@@ -142,9 +159,12 @@ void ScenarioStrengthFunctionConfig::changedAngles() {
 
 void ScenarioStrengthFunctionConfig::readValuesFromSpinBoxes() {
 	for (unsigned int row = 0; row < spin_boxes.size(); ++row) {
-		for (unsigned int col = 0; col < spin_boxes[row].size(); ++col) {
-			updated_values[row][col] = spin_boxes[row][col]->value();
-		}
+		updated_values[row].angle = spin_boxes[row][0]->value();
+		updated_values[row].cohesion = spin_boxes[row][1]->value();
+		updated_values[row].phi = spin_boxes[row][2]->value();
+//		for (unsigned int col = 0; col < spin_boxes[row].size(); ++col) {
+//			updated_values[row].setValue(col, spin_boxes[row][col]->value());
+//		}
 	}
 }
 
@@ -181,8 +201,8 @@ bool ScenarioStrengthFunctionConfig::collapseSlices() {
 }
 
 void ScenarioStrengthFunctionConfig::moveRow(int row, int target) {
-	std::vector<int> aux_int = updated_values[row];
-	std::vector<QSpinBox*> aux_spin_boxes = spin_boxes[row];
+	StrengthFunctionPieSlice aux_int = updated_values[row];
+	std::vector<QSpinBoxWithData*> aux_spin_boxes = spin_boxes[row];
 	QWidget* aux_color_widget = this->color_widgets[row];
 	updated_values.erase(updated_values.begin() + row);
 	updated_values.insert(updated_values.begin() + target, aux_int);
@@ -209,11 +229,9 @@ void ScenarioStrengthFunctionConfig::applyAngleShift() {
 void ScenarioStrengthFunctionConfig::applyAngleShift(int shift_value) {
 	this->readValuesFromSpinBoxes();
 	std::cout << "angleShiftSpinBox: " << shift_value << std::endl;
-	for (std::vector<QSpinBox*>& sp: spin_boxes) {
-		sp[0]->blockSignals(true);
-		sp[0]->setRange(-100000, 100000);
-		sp[0]->setValue(sp[0]->value() + shift_value);
-		sp[0]->blockSignals(false);
+	for (std::vector<QSpinBoxWithData*>& sp: spin_boxes) {
+		sp[0]->setRangeBlockingSignals(-100000, 100000);
+		sp[0]->setValueBlockingSignals(sp[0]->value() + shift_value);
 		std::cout << "New SpinBox Value: " << sp[0]->value() << std::endl;
 	}
 	bool need_rebuild = false;
@@ -222,12 +240,10 @@ void ScenarioStrengthFunctionConfig::applyAngleShift(int shift_value) {
 			int row = spin_boxes.size() - 1;
 			int end_value = spin_boxes[row][0]->value();
 			if (end_value > 90) {
-				spin_boxes[row][0]->blockSignals(true);
-				spin_boxes[row][0]->setValue(90);
-				spin_boxes[row][0]->blockSignals(false);
+				spin_boxes[row][0]->setValueBlockingSignals(90);
 				int new_value = end_value - 180;
 				updated_values.insert(updated_values.begin(), updated_values[row]);
-				updated_values[0][0] = new_value; // angle
+				updated_values[0].angle = new_value; // angle
 				spin_boxes.insert(spin_boxes.begin(), this->createSpinBoxes(updated_values[0]));
 				color_widgets.insert(color_widgets.begin(), this->createColorWidget(updated_values[0]));
 				// Check if we have to remove the last slice
@@ -250,12 +266,10 @@ void ScenarioStrengthFunctionConfig::applyAngleShift(int shift_value) {
 			int row = 0;
 			int end_value = spin_boxes[row][0]->value();
 			if (end_value < -90) {
-				spin_boxes[row][0]->blockSignals(true);
-				spin_boxes[row][0]->setValue(-90);
-				spin_boxes[row][0]->blockSignals(false);
+				spin_boxes[row][0]->setValueBlockingSignals(-90);
 				int new_value = end_value + 180;
 				updated_values.insert(updated_values.end(), updated_values[row]);
-				updated_values[updated_values.size() - 1][0] = new_value; // angle
+				updated_values[updated_values.size() - 1].angle = new_value; // angle
 				spin_boxes.insert(spin_boxes.end(), this->createSpinBoxes(updated_values[updated_values.size() - 1]));
 				color_widgets.insert(color_widgets.end(), this->createColorWidget(updated_values[updated_values.size() - 1]));
 				// Check if we have to remove the last slice
@@ -271,7 +285,8 @@ void ScenarioStrengthFunctionConfig::applyAngleShift(int shift_value) {
 			else {
 				if (!need_rebuild) {
 					// Move fraction to the bottom of the size of the shift
-					std::vector<int> new_bottom = {90, updated_values[0][1], updated_values[0][2]};
+					StrengthFunctionPieSlice new_bottom(updated_values[0]);
+					new_bottom.angle = 90;
 					updated_values.insert(updated_values.end(), new_bottom);
 					spin_boxes.insert(spin_boxes.end(), this->createSpinBoxes(new_bottom));
 					color_widgets.insert(color_widgets.end(), this->createColorWidget(new_bottom));
@@ -283,7 +298,8 @@ void ScenarioStrengthFunctionConfig::applyAngleShift(int shift_value) {
 	}
 	if (need_rebuild) {
 		if (shift_value < 0 && spin_boxes[spin_boxes.size() - 1][0]->value() < 90) {
-			std::vector<int> new_end = {std::min(90, updated_values[updated_values.size() - 1][0]) - shift_value, updated_values[0][1], updated_values[0][2]};
+			StrengthFunctionPieSlice new_end(updated_values[0]);
+			new_end.angle = std::min(90, updated_values[updated_values.size() - 1].angle) - shift_value;
 			updated_values.insert(updated_values.end(), new_end);
 			spin_boxes.insert(spin_boxes.end(), this->createSpinBoxes(new_end));
 			color_widgets.insert(color_widgets.end(), this->createColorWidget(new_end));
@@ -294,10 +310,10 @@ void ScenarioStrengthFunctionConfig::applyAngleShift(int shift_value) {
 	this->changedAngles();
 }
 
-QSpinBox* ScenarioStrengthFunctionConfig::getAngleSpinBox(int row) {
+QSpinBoxWithData *ScenarioStrengthFunctionConfig::getAngleSpinBox(int row) {
 	QGridLayout * grid_layout = ui->valueGrid;
 	QLayoutItem * item = grid_layout->itemAtPosition(row, 1);
-	return qobject_cast<QSpinBox *>(item->widget());
+	return qobject_cast<QSpinBoxWithData *>(item->widget());
 }
 
 void ScenarioStrengthFunctionConfig::updateAngleConstraints() {
@@ -329,7 +345,7 @@ int ScenarioStrengthFunctionConfig::getPropertyIndex(QString name) {
 void ScenarioStrengthFunctionConfig::toggleProperty(QString name, bool toggled) {
 	int index = ScenarioStrengthFunctionConfig::getPropertyIndex(name);
 	if (index != -1) {
-		for (std::vector<QSpinBox*>& sp: spin_boxes)
+		for (std::vector<QSpinBoxWithData*>& sp: spin_boxes)
 			sp[index]->setEnabled(toggled);
 		property_toggle_state[index] = toggled;
 		if (index == 0) {
@@ -349,7 +365,7 @@ void ScenarioStrengthFunctionConfig::applyPercentaje(double percentaje, QString 
 		}
 		else {
 			// Percentaje
-			for (std::vector<QSpinBox*>& sp: spin_boxes) {
+			for (std::vector<QSpinBoxWithData*>& sp: spin_boxes) {
 				int new_value = sp[index]->value();
 				new_value += (int) new_value * (percentaje / 100.0);
 				sp[index]->setValue(new_value);
@@ -358,7 +374,7 @@ void ScenarioStrengthFunctionConfig::applyPercentaje(double percentaje, QString 
 	}
 }
 
-std::vector<std::vector<int>> ScenarioStrengthFunctionConfig::getCurrentValues() {
+std::vector<StrengthFunctionPieSlice> ScenarioStrengthFunctionConfig::getCurrentValues() {
 	this->readValuesFromSpinBoxes();
 	return updated_values;
 }

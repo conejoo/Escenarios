@@ -156,7 +156,7 @@ void EscenarioFile::exportToFile(std::string filename, int seismic_index, int ma
 	for (int i = material_types_end; i <= strength_functions_start; i++)
 		myfile << lines[i] << std::endl;
 	for (StrengthFunction *function: strength_functions)
-		myfile << function->toString(material_index) << std::endl;
+		myfile << function->toString(material_index, property_short_name) << std::endl;
 	for(int i = strength_functions_end; i < (int)lines.size(); i++)
 		myfile << lines[i] << std::endl;
 	myfile.close();
