@@ -250,9 +250,13 @@ void ResultsProcessUI::exportResultsPromp(){
         auto sensible_index = sismic_index.second;
         sensible_index["c"]["delta"] = sensible_index["c"]["max"] - sensible_index["c"]["min"];
         sensible_index["phi"]["delta"] = sensible_index["phi"]["max"] - sensible_index["phi"]["min"];
-        sensible_index["uw"]["delta"] = sensible_index["uw"]["max"] - sensible_index["uw"]["min"];
-        auto seismic_avg = (sensible_index["c"]["min"] + sensible_index["c"]["max"] + sensible_index["phi"]["min"] + sensible_index["phi"]["max"] + sensible_index["uw"]["min"] + sensible_index["uw"]["max"]) / 6.0;
-        auto seismic_sd = sqrt(pow(sensible_index["c"]["delta"] / 2.0, 2) + pow(sensible_index["phi"]["delta"] / 2.0, 2) + pow(sensible_index["uw"]["delta"] / 2.0, 2));
+		sensible_index["ang"]["delta"] = sensible_index["ang"]["max"] - sensible_index["ang"]["min"];
+		auto seismic_avg = (sensible_index["c"]["min"] + sensible_index["c"]["max"]
+				+ sensible_index["phi"]["min"] + sensible_index["phi"]["max"]
+				+ sensible_index["ang"]["min"] + sensible_index["ang"]["max"]) / 6.0;
+		auto seismic_sd = sqrt(pow(sensible_index["c"]["delta"] / 2.0, 2)
+				+ pow(sensible_index["phi"]["delta"] / 2.0, 2)
+				+ pow(sensible_index["ang"]["delta"] / 2.0, 2));
 
         summaryFile << translateSeismicScenario(sismic_index.first) << ",";
         summaryFile << sensible_index["-"]["med"] << ",";
@@ -274,9 +278,9 @@ void ResultsProcessUI::exportResultsPromp(){
         summaryFile << sensible_index["phi"]["max"] << ",";
         summaryFile << sensible_index["phi"]["delta"] << ",";
 
-        summaryFile << sensible_index["uw"]["min"] << ",";
-        summaryFile << sensible_index["uw"]["max"] << ",";
-        summaryFile << sensible_index["uw"]["delta"];
+		summaryFile << sensible_index["ang"]["min"] << ",";
+		summaryFile << sensible_index["ang"]["max"] << ",";
+		summaryFile << sensible_index["ang"]["delta"];
 
         summaryFile << std::endl;
     }
