@@ -3,6 +3,7 @@
 #include "scenariostrengthfunctionconfig.h"
 #include "gui/scenarios/scenariostrengthfunctionconfig.h"
 #include "model/scenarios/strengthfunction.h"
+#include "model/scenarios/materialproperty.h"
 
 StrengthFunctionConfig::StrengthFunctionConfig(QWidget *parent, StrengthFunction *strength_function) :
 	QWidget(parent),
@@ -47,8 +48,11 @@ void StrengthFunctionConfig::escenarioChangedName(int index, QString newname){
 void StrengthFunctionConfig::applyPercentaje(double percentaje, int scenario_index, QString property_short_name){
 	if (strength_function_scenarios.find(scenario_index) != strength_function_scenarios.end()) {
 		ScenarioStrengthFunctionConfig* config = strength_function_scenarios[scenario_index];
-		if (config)
-			config->applyPercentaje(percentaje, property_short_name);
+		if (config) {
+			ScenarioStrengthFunctionConfig* base_config = strength_function_scenarios[MaterialProperty::ORIGINAL_VALUE];
+			std::vector<StrengthFunctionPieSlice> current_base_values = base_config->getCurrentValues();
+			config->applyPercentaje(percentaje, property_short_name, current_base_values);
+		}
 	}
 }
 

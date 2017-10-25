@@ -130,6 +130,7 @@ std::vector<QSpinBoxWithData *> ScenarioStrengthFunctionConfig::createSpinBoxes(
 }
 QBrush ScenarioStrengthFunctionConfig::getColor(StrengthFunctionPieSlice& values) {
 	std::string key = QStringLiteral("serie_%1_%1").arg(values.cohesion, values.phi).toStdString();
+	//std::string key = QStringLiteral("serie_%1").arg(values.material_index).toStdString();
 	if (this->color_map.find(key) == this->color_map.end()) {
 		// not found
 		this->color_map[key] = this->colors[next_color];
@@ -356,7 +357,7 @@ void ScenarioStrengthFunctionConfig::toggleProperty(QString name, bool toggled) 
 	}
 }
 
-void ScenarioStrengthFunctionConfig::applyPercentaje(double percentaje, QString property_short_name) {
+void ScenarioStrengthFunctionConfig::applyPercentaje(double percentaje, QString property_short_name, std::vector<StrengthFunctionPieSlice> base_values) {
 	int index = ScenarioStrengthFunctionConfig::getPropertyIndex(property_short_name);
 	if (index != -1) {
 		if (index == 0) {
@@ -366,9 +367,15 @@ void ScenarioStrengthFunctionConfig::applyPercentaje(double percentaje, QString 
 		else {
 			// Percentaje
 			for (std::vector<QSpinBoxWithData*>& sp: spin_boxes) {
-				int new_value = sp[index]->value();
-				new_value += (int) new_value * (percentaje / 100.0);
-				sp[index]->setValue(new_value);
+				int material_key = sp[0]->getData(PIE_SLICE_MATERIAL_KEY);
+				for (StrengthFunctionPieSlice &slice: base_values) {
+					if (slice.material_index == material_key) {
+						int new_value = slice.getValue(index);
+						new_value += (int) new_value * (percentaje / 100.0);
+						sp[index]->setValueBlockingSignals(new_value);
+						break;
+					}
+				}
 			}
 		}
 	}

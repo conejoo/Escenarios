@@ -23,7 +23,7 @@ class ScenarioStrengthFunctionConfig : public QWidget
 		explicit ScenarioStrengthFunctionConfig(QWidget *parent = 0, StrengthFunction* function = 0);
 		~ScenarioStrengthFunctionConfig();
 		void toggleProperty(QString name, bool toggled);
-		void applyPercentaje(double percentaje, QString property_short_name);
+		void applyPercentaje(double percentaje, QString property_short_name, std::vector<StrengthFunctionPieSlice> base_values);
 		void applyAngleShift(int angle);
 		std::vector<StrengthFunctionPieSlice> getCurrentValues();
 
