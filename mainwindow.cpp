@@ -83,7 +83,7 @@ void MainWindow::exportScenariosPromp()
 	{
 		for (Material& material: main_scenario.materials) {
 			if (material.type == 0) {
-				std::vector<MaterialProperty>& props = main_scenario.materials[0].properties;
+				std::vector<MaterialProperty>& props = material.properties;
 				for(MaterialProperty& prop: props)
 					if(prop.editable) {
 						_parametros << prop.name << ",";
@@ -323,7 +323,7 @@ void MainWindow::addProperties(){
 	// Add properties from material without strength function
 	for (Material &material: main_scenario.materials) {
 		if (material.type == 0) {
-			for (MaterialProperty &property: main_scenario.materials[0].properties) {
+			for (MaterialProperty &property: material.properties) {
 				if(!property.editable)
 					continue;
 				QCheckBox* qcheckbox = new QCheckBox(QString::fromStdWString(property.name), ui->widget_sensibilizar);
